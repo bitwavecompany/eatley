@@ -9,6 +9,7 @@ export interface AppEnv {
     storageBucket: string
     messagingSenderId: string
     appId: string
+    measurementId?: string
   }
   firebaseRootPath: string
   esp32OfflineThresholdSec: number
@@ -50,6 +51,7 @@ export const env: AppEnv = {
     storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || '',
     messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
     appId: import.meta.env.VITE_FIREBASE_APP_ID || '',
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
   },
   firebaseRootPath: (import.meta.env.VITE_FIREBASE_ROOT_PATH || 'eatley_v1').replace(/^\/+|\/+$/g, ''),
   esp32OfflineThresholdSec: Number(import.meta.env.VITE_ESP32_OFFLINE_THRESHOLD_SEC) || 45,

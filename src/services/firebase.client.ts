@@ -27,6 +27,7 @@ export function getFirebaseApp(): FirebaseApp | null {
         storageBucket: env.firebase.storageBucket,
         messagingSenderId: env.firebase.messagingSenderId,
         appId: env.firebase.appId,
+        ...(env.firebase.measurementId ? { measurementId: env.firebase.measurementId } : {}),
       })
     }
   }
