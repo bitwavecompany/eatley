@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { Icon } from '@iconify/vue'
+import { Loader2, Timer, Utensils, RotateCw, Clock, Sparkles, CheckCircle2 } from '@lucide/vue'
 import { useDeviceStore } from '@/stores/useDeviceStore'
 import { useConfigStore } from '@/stores/useConfigStore'
 import { useCooldown } from '@/composables/useCooldown'
@@ -41,16 +41,16 @@ async function handleFeedClick() {
 </script>
 
 <template>
-  <div class="relative overflow-hidden rounded-3xl bg-gradient-to-b from-slate-900 to-slate-900/90 border border-slate-800 p-6 sm:p-8 shadow-2xl">
+  <div class="relative overflow-hidden rounded-3xl bg-white border border-slate-200 p-6 sm:p-8 shadow-xl shadow-slate-100">
     <!-- Ambient Background Glow -->
     <div
       class="pointer-events-none absolute -top-24 -left-24 w-72 h-72 rounded-full blur-3xl transition-opacity duration-700"
       :class="[
         deviceStore.isDispensing
-          ? 'bg-amber-500/20 opacity-100'
+          ? 'bg-amber-400/20 opacity-100'
           : isCoolingDown
-            ? 'bg-blue-500/10 opacity-70'
-            : 'bg-emerald-500/15 opacity-80'
+            ? 'bg-slate-200/50 opacity-70'
+            : 'bg-emerald-400/15 opacity-80'
       ]"
     ></div>
 
@@ -61,26 +61,23 @@ async function handleFeedClick() {
           class="w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center border transition-all duration-300"
           :class="[
             deviceStore.isDispensing
-              ? 'bg-amber-500/15 border-amber-500/40 text-amber-400 scale-105 shadow-lg shadow-amber-500/20'
+              ? 'bg-amber-50 border-amber-300 text-amber-600 scale-105 shadow-md shadow-amber-500/10'
               : isCoolingDown
-                ? 'bg-slate-800/80 border-slate-700 text-slate-400'
-                : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400 hover:scale-105 shadow-xl shadow-emerald-500/10'
+                ? 'bg-slate-100 border-slate-200 text-slate-500'
+                : 'bg-emerald-50 border-emerald-200 text-emerald-600 hover:scale-105 shadow-lg shadow-emerald-500/10'
           ]"
         >
-          <Icon
+          <Loader2
             v-if="deviceStore.isDispensing"
-            icon="lucide:loader-2"
-            class="w-12 h-12 animate-spin text-amber-400"
+            class="w-12 h-12 animate-spin text-amber-600"
           />
-          <Icon
+          <Timer
             v-else-if="isCoolingDown"
-            icon="lucide:timer"
-            class="w-12 h-12 text-slate-400"
+            class="w-12 h-12 text-slate-500"
           />
-          <Icon
+          <Utensils
             v-else
-            icon="lucide:utensils"
-            class="w-12 h-12 text-emerald-400"
+            class="w-12 h-12 text-emerald-600"
           />
         </div>
 
@@ -90,16 +87,16 @@ async function handleFeedClick() {
           class="absolute bottom-1 right-1 flex h-4 w-4"
         >
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-slate-900"></span>
+          <span class="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-white"></span>
         </span>
       </div>
 
       <!-- Action Title & Subtitle -->
-      <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
         {{ deviceStore.isDispensing ? 'Dispensando Alimento...' : 'Disparo Manual' }}
       </h2>
 
-      <p class="mt-2 text-sm text-slate-400 max-w-sm">
+      <p class="mt-2 text-sm text-slate-600 max-w-sm">
         {{
           deviceStore.isDispensing
             ? 'El servomotor MG996R está ejecutando el ciclo de apertura configurado.'
@@ -118,26 +115,23 @@ async function handleFeedClick() {
           class="w-full py-4 px-6 rounded-2xl font-bold text-base sm:text-lg tracking-wide transition-all duration-200 flex items-center justify-center gap-3 shadow-lg active:scale-95 disabled:active:scale-100 disabled:cursor-not-allowed select-none"
           :class="[
             deviceStore.isDispensing
-              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 cursor-wait'
+              ? 'bg-amber-100 text-amber-800 border border-amber-300 cursor-wait'
               : isCoolingDown
-                ? 'bg-slate-800 text-slate-400 border border-slate-700/60'
-                : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-emerald-500/25 hover:shadow-emerald-500/40'
+                ? 'bg-slate-100 text-slate-500 border border-slate-200'
+                : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/25 hover:shadow-emerald-600/40'
           ]"
         >
-          <Icon
+          <RotateCw
             v-if="deviceStore.isDispensing"
-            icon="lucide:rotate-cw"
-            class="w-6 h-6 animate-spin text-amber-300"
+            class="w-6 h-6 animate-spin text-amber-800"
           />
-          <Icon
+          <Clock
             v-else-if="isCoolingDown"
-            icon="lucide:clock"
-            class="w-6 h-6 text-slate-400"
+            class="w-6 h-6 text-slate-500"
           />
-          <Icon
+          <Sparkles
             v-else
-            icon="lucide:sparkles"
-            class="w-6 h-6 text-slate-950"
+            class="w-6 h-6 text-white"
           />
 
           <span>
@@ -155,10 +149,10 @@ async function handleFeedClick() {
       <!-- Cooldown Progress Bar -->
       <div
         v-if="isCoolingDown"
-        class="w-full max-w-xs mt-3 bg-slate-800 rounded-full h-1.5 overflow-hidden border border-slate-700/60"
+        class="w-full max-w-xs mt-3 bg-slate-100 rounded-full h-1.5 overflow-hidden border border-slate-200"
       >
         <div
-          class="bg-emerald-400 h-full rounded-full transition-all duration-300 ease-linear"
+          class="bg-emerald-600 h-full rounded-full transition-all duration-300 ease-linear"
           :style="{ width: `${progressPercent}%` }"
         ></div>
       </div>
@@ -174,9 +168,9 @@ async function handleFeedClick() {
       >
         <div
           v-if="showSuccessMessage"
-          class="mt-4 px-4 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center gap-2 shadow-sm"
+          class="mt-4 px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2 shadow-sm"
         >
-          <Icon icon="lucide:check-circle-2" class="w-4 h-4 text-emerald-400" />
+          <CheckCircle2 class="w-4 h-4 text-emerald-600" />
           <span>¡Ración servida exitosamente por el ESP32!</span>
         </div>
       </transition>

@@ -23,7 +23,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col bg-slate-950 text-slate-100">
+  <div class="min-h-screen flex flex-col bg-slate-50 text-slate-900">
     <!-- Unconfigured Firebase Warning Banner -->
     <EnvWarningBanner />
 

@@ -9,7 +9,6 @@ import {
 } from 'firebase/database'
 import { getFirebaseDb } from './firebase.client'
 import { DB_PATHS, SERVO_CONSTRAINTS, OPERATIONAL_CONSTRAINTS } from '@/config/constants'
-import { env } from '@/config/env'
 import type {
   Alarma,
   CrearAlarmaPayload,
@@ -46,101 +45,29 @@ export const DEFAULT_CONFIGURACION: ConfiguracionDispositivo = {
 }
 
 /**
- * Local in-memory mock state for Demo Mode (when Firebase credentials are not set)
+ * Local in-memory state for unconfigured/local mode (Empty, zero mock data)
  */
 class LocalMockStore {
   disparoManual: DisparoManual = {
     pendiente: false,
-    solicitado_en: Date.now(),
+    solicitado_en: 0,
     origen_solicitud: 'boton_principal',
   }
 
-  alarmas: Map<string, Alarma> = new Map([
-    [
-      'demo-alarm-1',
-      {
-        id: 'demo-alarm-1',
-        hora: '07:30',
-        etiqueta: 'Desayuno Michi',
-        activa: true,
-        tipo_repeticion: 'dias_semana',
-        dias_semana: [1, 2, 3, 4, 5, 6, 0], // Todos los días
-        fecha_especifica: null,
-        ultima_ejecucion_fecha: new Date(Date.now() - 86400000).toISOString().split('T')[0],
-        omitida_hoy_fecha: null,
-        creada_en: Date.now() - 604800000,
-      },
-    ],
-    [
-      'demo-alarm-2',
-      {
-        id: 'demo-alarm-2',
-        hora: '13:00',
-        etiqueta: 'Almuerzo Proteico',
-        activa: true,
-        tipo_repeticion: 'dias_semana',
-        dias_semana: [1, 2, 3, 4, 5], // L-V
-        fecha_especifica: null,
-        ultima_ejecucion_fecha: null,
-        omitida_hoy_fecha: null,
-        creada_en: Date.now() - 400000000,
-      },
-    ],
-    [
-      'demo-alarm-3',
-      {
-        id: 'demo-alarm-3',
-        hora: '19:30',
-        etiqueta: 'Cena Ligera',
-        activa: true,
-        tipo_repeticion: 'dias_semana',
-        dias_semana: [1, 2, 3, 4, 5, 6, 0],
-        fecha_especifica: null,
-        ultima_ejecucion_fecha: null,
-        omitida_hoy_fecha: null,
-        creada_en: Date.now() - 300000000,
-      },
-    ],
-  ])
+  alarmas: Map<string, Alarma> = new Map()
 
   configuracion: ConfiguracionDispositivo = { ...DEFAULT_CONFIGURACION }
 
-  estadoEsp32: EstadoEsp32 = {
-    ultima_conexion: Date.now(),
-    rssi_dbm: -64,
-    uptime_seg: 3420,
-    memoria_libre_kb: 184,
-    alarma_perdida_id: null,
-    comando_admin: 'ninguno',
-  }
+  estadoEsp32: EstadoEsp32 | null = null
 
-  historial: EventoHistorial[] = [
-    {
-      id: 'demo-hist-1',
-      timestamp: Date.now() - 3600000 * 2,
-      origen: 'alarma',
-      alarma_etiqueta: 'Desayuno Michi',
-      estado_esp32: 'completado',
-      confirmacion_microswitch: 'no_aplicable',
-      duracion_abierto_ms: 250,
-    },
-    {
-      id: 'demo-hist-2',
-      timestamp: Date.now() - 3600000 * 6,
-      origen: 'manual',
-      alarma_etiqueta: null,
-      estado_esp32: 'completado',
-      confirmacion_microswitch: 'no_aplicable',
-      duracion_abierto_ms: 250,
-    },
-  ]
+  historial: EventoHistorial[] = []
 
   // Subscribers
   listeners = {
     disparoManual: new Set<(val: DisparoManual) => void>(),
     alarmas: new Set<(val: Alarma[]) => void>(),
     configuracion: new Set<(val: ConfiguracionDispositivo) => void>(),
-    estadoEsp32: new Set<(val: EstadoEsp32) => void>(),
+    estadoEsp32: new Set<(val: EstadoEsp32 | null) => void>(),
     historial: new Set<(val: EventoHistorial[]) => void>(),
   }
 
@@ -157,7 +84,7 @@ class LocalMockStore {
   }
 
   notifyEstado() {
-    this.listeners.estadoEsp32.forEach((cb) => cb({ ...this.estadoEsp32 }))
+    this.listeners.estadoEsp32.forEach((cb) => cb(this.estadoEsp32 ? { ...this.estadoEsp32 } : null))
   }
 
   notifyHistorial() {
@@ -166,15 +93,6 @@ class LocalMockStore {
 }
 
 const localMock = new LocalMockStore()
-
-// Simulate subtle heartbeat in demo mode
-if (!env.isFirebaseConfigured && typeof window !== 'undefined') {
-  setInterval(() => {
-    localMock.estadoEsp32.ultima_conexion = Date.now()
-    localMock.estadoEsp32.uptime_seg += 10
-    localMock.notifyEstado()
-  }, 10000)
-}
 
 /**
  * Feeder Repository: Central abstraction for Firebase Realtime Database
@@ -210,13 +128,12 @@ export const FeederRepository = {
       localMock.disparoManual = payload
       localMock.notifyDisparo()
 
-      // In demo mode, simulate ESP32 executing the request after 1.2 seconds
+      // In local mode, simulate immediate completion without hanging
       if (pendiente) {
         setTimeout(() => {
           localMock.disparoManual.pendiente = false
           localMock.notifyDisparo()
 
-          // Add to mock history
           const event: EventoHistorial = {
             id: `evt-${Date.now()}`,
             timestamp: Date.now(),
@@ -228,7 +145,7 @@ export const FeederRepository = {
           }
           localMock.historial.unshift(event)
           localMock.notifyHistorial()
-        }, 1200)
+        }, 1000)
       }
       return
     }
@@ -341,7 +258,6 @@ export const FeederRepository = {
       if (data) {
         callback({ ...DEFAULT_CONFIGURACION, ...data })
       } else {
-        // Node does not exist yet: write defaults
         void set(nodeRef, DEFAULT_CONFIGURACION)
         callback({ ...DEFAULT_CONFIGURACION })
       }
@@ -366,7 +282,7 @@ export const FeederRepository = {
   subscribeEstadoEsp32(callback: (estado: EstadoEsp32 | null) => void): Unsubscribe {
     const db = getFirebaseDb()
     if (!db) {
-      callback({ ...localMock.estadoEsp32 })
+      callback(localMock.estadoEsp32 ? { ...localMock.estadoEsp32 } : null)
       localMock.listeners.estadoEsp32.add(callback)
       return () => localMock.listeners.estadoEsp32.delete(callback)
     }
@@ -381,15 +297,17 @@ export const FeederRepository = {
   async enviarComandoAdmin(comando: ComandoAdmin): Promise<void> {
     const db = getFirebaseDb()
     if (!db) {
-      localMock.estadoEsp32.comando_admin = comando
-      localMock.notifyEstado()
-
-      // Reset back to 'ninguno' after 2.5s simulation
-      if (comando !== 'ninguno') {
-        setTimeout(() => {
-          localMock.estadoEsp32.comando_admin = 'ninguno'
-          localMock.notifyEstado()
-        }, 2500)
+      if (localMock.estadoEsp32) {
+        localMock.estadoEsp32.comando_admin = comando
+        localMock.notifyEstado()
+        if (comando !== 'ninguno') {
+          setTimeout(() => {
+            if (localMock.estadoEsp32) {
+              localMock.estadoEsp32.comando_admin = 'ninguno'
+              localMock.notifyEstado()
+            }
+          }, 2000)
+        }
       }
       return
     }
@@ -422,7 +340,7 @@ export const FeederRepository = {
           ...item,
           id: item.id || key,
         }))
-        .sort((a, b) => b.timestamp - a.timestamp) // More recent first
+        .sort((a, b) => b.timestamp - a.timestamp)
 
       callback(list)
     })

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Icon } from '@iconify/vue'
+import { Bell, Calendar, Pencil, Trash2 } from '@lucide/vue'
 import { DAYS_OF_WEEK } from '@/config/constants'
 import type { Alarma } from '@/types/alarm.types'
 
@@ -50,20 +50,20 @@ function isDayActive(dayId: number): boolean {
     class="relative rounded-2xl border transition-all duration-200 p-4 sm:p-5 flex flex-col justify-between overflow-hidden"
     :class="[
       alarma.activa
-        ? 'bg-slate-900 border-slate-700/80 shadow-md shadow-emerald-500/5'
-        : 'bg-slate-900/50 border-slate-800/80 opacity-70'
+        ? 'bg-white border-slate-200 shadow-md shadow-slate-100'
+        : 'bg-slate-50 border-slate-200/80 opacity-70'
     ]"
   >
     <!-- Top row: Label & Switch Toggle -->
     <div class="flex items-center justify-between gap-3">
       <div class="flex items-center gap-2 truncate">
         <span
-          class="w-2 h-2 rounded-full"
-          :class="alarma.activa ? 'bg-emerald-400' : 'bg-slate-600'"
+          class="w-2.5 h-2.5 rounded-full"
+          :class="alarma.activa ? 'bg-emerald-500' : 'bg-slate-300'"
         ></span>
         <h4
           class="font-semibold text-sm sm:text-base truncate"
-          :class="alarma.activa ? 'text-slate-200' : 'text-slate-400'"
+          :class="alarma.activa ? 'text-slate-900' : 'text-slate-500'"
         >
           {{ alarma.etiqueta || 'Alarma sin nombre' }}
         </h4>
@@ -75,11 +75,11 @@ function isDayActive(dayId: number): boolean {
         role="switch"
         :aria-checked="alarma.activa"
         @click.stop="emit('toggle', alarma.id)"
-        class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-slate-900"
-        :class="alarma.activa ? 'bg-emerald-500' : 'bg-slate-700'"
+        class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-white"
+        :class="alarma.activa ? 'bg-emerald-600' : 'bg-slate-300'"
       >
         <span
-          class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out"
+          class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out"
           :class="alarma.activa ? 'translate-x-5' : 'translate-x-0'"
         />
       </button>
@@ -89,17 +89,17 @@ function isDayActive(dayId: number): boolean {
     <div class="my-3 flex items-baseline gap-2">
       <span
         class="text-4xl sm:text-5xl font-extrabold tracking-tight font-mono"
-        :class="alarma.activa ? 'text-white' : 'text-slate-500'"
+        :class="alarma.activa ? 'text-slate-900' : 'text-slate-400'"
       >
         {{ alarma.hora }}
       </span>
-      <span class="text-xs font-medium text-slate-400">
+      <span class="text-xs font-medium text-slate-500">
         {{ repetitionLabel }}
       </span>
     </div>
 
     <!-- Bottom row: Days indicators & Actions -->
-    <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between gap-2">
+    <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
       <!-- Days of week indicator pills -->
       <div v-if="alarma.tipo_repeticion === 'dias_semana'" class="flex items-center gap-1">
         <span
@@ -109,18 +109,18 @@ function isDayActive(dayId: number): boolean {
           :class="[
             isDayActive(d.id)
               ? alarma.activa
-                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                : 'bg-slate-800 text-slate-400'
-              : 'text-slate-600'
+                ? 'bg-emerald-50 text-emerald-700 border border-emerald-300'
+                : 'bg-slate-200 text-slate-600'
+              : 'text-slate-300'
           ]"
         >
           {{ d.letter }}
         </span>
       </div>
 
-      <div v-else class="flex items-center gap-1.5 text-xs text-slate-400">
-        <Icon
-          :icon="alarma.tipo_repeticion === 'una_vez' ? 'lucide:bell' : 'lucide:calendar'"
+      <div v-else class="flex items-center gap-1.5 text-xs text-slate-500">
+        <component
+          :is="alarma.tipo_repeticion === 'una_vez' ? Bell : Calendar"
           class="w-3.5 h-3.5 text-slate-400"
         />
         <span class="font-mono text-[11px]">
@@ -133,19 +133,19 @@ function isDayActive(dayId: number): boolean {
         <button
           type="button"
           @click.stop="emit('edit', alarma)"
-          class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+          class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           title="Editar alarma"
         >
-          <Icon icon="lucide:pencil" class="w-4 h-4" />
+          <Pencil class="w-4 h-4" />
         </button>
 
         <button
           type="button"
           @click.stop="emit('delete', alarma.id)"
-          class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+          class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
           title="Eliminar alarma"
         >
-          <Icon icon="lucide:trash-2" class="w-4 h-4" />
+          <Trash2 class="w-4 h-4" />
         </button>
       </div>
     </div>

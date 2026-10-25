@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { Icon } from '@iconify/vue'
+import { Gauge, Loader2, Play, CheckCircle, Save } from '@lucide/vue'
 import { useConfigStore } from '@/stores/useConfigStore'
 import { useDeviceStore } from '@/stores/useDeviceStore'
 import { SERVO_CONSTRAINTS } from '@/config/constants'
@@ -17,7 +17,6 @@ const desactivarPulso = ref(configStore.configuracion.desactivar_pulso_en_reposo
 
 const saveSuccess = ref(false)
 
-// Sync when remote config arrives
 watch(
   () => configStore.configuracion,
   (cfg) => {
@@ -51,15 +50,15 @@ async function handleTestServo() {
 </script>
 
 <template>
-  <div class="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 sm:p-7 shadow-xl">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-slate-800 gap-4">
+  <div class="rounded-3xl border border-slate-200 bg-white p-6 sm:p-7 shadow-sm">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-slate-100 gap-4">
       <div class="flex items-center gap-3">
-        <div class="p-2.5 rounded-2xl bg-emerald-500/10 text-emerald-400">
-          <Icon icon="lucide:gauge" class="w-6 h-6" />
+        <div class="p-2.5 rounded-2xl bg-emerald-50 text-emerald-600">
+          <Gauge class="w-6 h-6" />
         </div>
         <div>
-          <h3 class="text-lg font-bold text-white">Calibración Servomotor MG996R</h3>
-          <p class="text-xs text-slate-400">Ajusta los ángulos mecánicos y tiempos sin reprogramar el microcontrolador</p>
+          <h3 class="text-lg font-bold text-slate-900">Calibración Servomotor MG996R</h3>
+          <p class="text-xs text-slate-500">Ajusta los ángulos mecánicos y tiempos sin reprogramar el microcontrolador</p>
         </div>
       </div>
 
@@ -68,17 +67,20 @@ async function handleTestServo() {
         type="button"
         @click="handleTestServo"
         :disabled="deviceStore.activeAdminCommand === 'probar_servo'"
-        class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 border"
+        class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 border shadow-sm"
         :class="[
           deviceStore.activeAdminCommand === 'probar_servo'
-            ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 cursor-wait'
-            : 'bg-slate-800 hover:bg-slate-700/80 text-emerald-400 border-slate-700'
+            ? 'bg-amber-100 text-amber-800 border-amber-300 cursor-wait'
+            : 'bg-slate-50 hover:bg-slate-100 text-emerald-700 border-slate-200'
         ]"
       >
-        <Icon
-          :icon="deviceStore.activeAdminCommand === 'probar_servo' ? 'lucide:loader-2' : 'lucide:play'"
-          class="w-4 h-4"
-          :class="{ 'animate-spin': deviceStore.activeAdminCommand === 'probar_servo' }"
+        <Loader2
+          v-if="deviceStore.activeAdminCommand === 'probar_servo'"
+          class="w-4 h-4 animate-spin text-amber-600"
+        />
+        <Play
+          v-else
+          class="w-4 h-4 text-emerald-600"
         />
         <span>
           {{ deviceStore.activeAdminCommand === 'probar_servo' ? 'Probando servo...' : 'Probar Servo en Seco' }}
@@ -91,14 +93,14 @@ async function handleTestServo() {
       <!-- Ángulo Cerrado (0° a 45°) -->
       <div>
         <div class="flex items-center justify-between mb-2">
-          <label class="text-sm font-semibold text-slate-200">
+          <label class="text-sm font-semibold text-slate-700">
             Ángulo de Cierre (Reposo)
           </label>
-          <span class="font-mono text-sm font-bold px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-emerald-400">
+          <span class="font-mono text-sm font-bold px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-emerald-700">
             {{ anguloCerrado }}°
           </span>
         </div>
-        <p class="text-xs text-slate-400 mb-2">Posición hermética de la compuerta para retener las croquetas.</p>
+        <p class="text-xs text-slate-500 mb-2">Posición hermética de la compuerta para retener las croquetas.</p>
         <div class="flex items-center gap-4">
           <input
             type="range"
@@ -108,21 +110,21 @@ async function handleTestServo() {
             :step="SERVO_CONSTRAINTS.ANGULO_CERRADO.STEP"
             class="flex-1"
           />
-          <span class="text-xs font-mono text-slate-500 w-16 text-right">0° - 45°</span>
+          <span class="text-xs font-mono text-slate-400 w-16 text-right">0° - 45°</span>
         </div>
       </div>
 
       <!-- Ángulo Abierto (30° a 180°) -->
       <div>
         <div class="flex items-center justify-between mb-2">
-          <label class="text-sm font-semibold text-slate-200">
+          <label class="text-sm font-semibold text-slate-700">
             Ángulo de Apertura
           </label>
-          <span class="font-mono text-sm font-bold px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-emerald-400">
+          <span class="font-mono text-sm font-bold px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-emerald-700">
             {{ anguloAbierto }}°
           </span>
         </div>
-        <p class="text-xs text-slate-400 mb-2">Giro máximo para permitir la caída del alimento.</p>
+        <p class="text-xs text-slate-500 mb-2">Giro máximo para permitir la caída del alimento.</p>
         <div class="flex items-center gap-4">
           <input
             type="range"
@@ -132,21 +134,21 @@ async function handleTestServo() {
             :step="SERVO_CONSTRAINTS.ANGULO_ABIERTO.STEP"
             class="flex-1"
           />
-          <span class="text-xs font-mono text-slate-500 w-16 text-right">30° - 180°</span>
+          <span class="text-xs font-mono text-slate-400 w-16 text-right">30° - 180°</span>
         </div>
       </div>
 
       <!-- Tiempo Abierto (100ms a 3000ms) -->
       <div>
         <div class="flex items-center justify-between mb-2">
-          <label class="text-sm font-semibold text-slate-200">
+          <label class="text-sm font-semibold text-slate-700">
             Tiempo de Compuerta Abierta
           </label>
-          <span class="font-mono text-sm font-bold px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-emerald-400">
+          <span class="font-mono text-sm font-bold px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-emerald-700">
             {{ tiempoAbiertoMs }} ms
           </span>
         </div>
-        <p class="text-xs text-slate-400 mb-2">Duración en milisegundos que permanece la compuerta abierta antes de retornar.</p>
+        <p class="text-xs text-slate-500 mb-2">Duración en milisegundos que permanece la compuerta abierta antes de retornar.</p>
         <div class="flex items-center gap-4">
           <input
             type="range"
@@ -156,17 +158,17 @@ async function handleTestServo() {
             :step="SERVO_CONSTRAINTS.TIEMPO_ABIERTO_MS.STEP"
             class="flex-1"
           />
-          <span class="text-xs font-mono text-slate-500 w-16 text-right">0.1s - 3s</span>
+          <span class="text-xs font-mono text-slate-400 w-16 text-right">0.1s - 3s</span>
         </div>
       </div>
 
       <!-- Mechanical Switches -->
-      <div class="pt-4 border-t border-slate-800 space-y-4">
+      <div class="pt-4 border-t border-slate-100 space-y-4">
         <!-- Anti-jamming Shake -->
-        <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800">
+        <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
           <div>
-            <span class="text-sm font-semibold text-white block">Maniobra de Sacudida Anti-Atasco</span>
-            <span class="text-xs text-slate-400">Aplica micro-oscilaciones de ±5° en el pico de la botella para desatorar croquetas grandes.</span>
+            <span class="text-sm font-semibold text-slate-900 block">Maniobra de Sacudida Anti-Atasco</span>
+            <span class="text-xs text-slate-500">Aplica micro-oscilaciones de ±5° en el pico de la botella para desatorar croquetas grandes.</span>
           </div>
           <button
             type="button"
@@ -174,7 +176,7 @@ async function handleTestServo() {
             :aria-checked="activarSacudida"
             @click="activarSacudida = !activarSacudida"
             class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
-            :class="activarSacudida ? 'bg-emerald-500' : 'bg-slate-700'"
+            :class="activarSacudida ? 'bg-emerald-600' : 'bg-slate-300'"
           >
             <span
               class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
@@ -184,10 +186,10 @@ async function handleTestServo() {
         </div>
 
         <!-- PWM Cutoff in Rest -->
-        <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800">
+        <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
           <div>
-            <span class="text-sm font-semibold text-white block">Corte de Pulso PWM en Reposo</span>
-            <span class="text-xs text-slate-400">Desactiva el tren de pulsos tras cerrar para eliminar zumbido eléctrico y sobrecalentamiento del MG996R.</span>
+            <span class="text-sm font-semibold text-slate-900 block">Corte de Pulso PWM en Reposo</span>
+            <span class="text-xs text-slate-500">Desactiva el tren de pulsos tras cerrar para eliminar zumbido eléctrico y sobrecalentamiento del MG996R.</span>
           </div>
           <button
             type="button"
@@ -195,7 +197,7 @@ async function handleTestServo() {
             :aria-checked="desactivarPulso"
             @click="desactivarPulso = !desactivarPulso"
             class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
-            :class="desactivarPulso ? 'bg-emerald-500' : 'bg-slate-700'"
+            :class="desactivarPulso ? 'bg-emerald-600' : 'bg-slate-300'"
           >
             <span
               class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
@@ -207,8 +209,8 @@ async function handleTestServo() {
 
       <!-- Action Footer -->
       <div class="pt-4 flex items-center justify-between">
-        <span v-if="saveSuccess" class="text-xs font-semibold text-emerald-400 flex items-center gap-1.5">
-          <Icon icon="lucide:check-circle" class="w-4 h-4" />
+        <span v-if="saveSuccess" class="text-xs font-semibold text-emerald-700 flex items-center gap-1.5">
+          <CheckCircle class="w-4 h-4 text-emerald-600" />
           ¡Parámetros de servo sincronizados con Firebase!
         </span>
         <span v-else></span>
@@ -217,12 +219,15 @@ async function handleTestServo() {
           type="button"
           @click="handleSave"
           :disabled="configStore.isSaving"
-          class="px-5 py-2.5 rounded-xl font-bold text-sm text-slate-950 bg-emerald-400 hover:bg-emerald-300 shadow-md shadow-emerald-500/20 transition-all flex items-center gap-2"
+          class="px-5 py-2.5 rounded-xl font-bold text-sm text-white bg-emerald-600 hover:bg-emerald-500 shadow-md shadow-emerald-600/20 transition-all flex items-center gap-2"
         >
-          <Icon
-            :icon="configStore.isSaving ? 'lucide:loader-2' : 'lucide:save'"
+          <Loader2
+            v-if="configStore.isSaving"
+            class="w-4 h-4 animate-spin"
+          />
+          <Save
+            v-else
             class="w-4 h-4"
-            :class="{ 'animate-spin': configStore.isSaving }"
           />
           <span>{{ configStore.isSaving ? 'Guardando...' : 'Guardar Calibración' }}</span>
         </button>

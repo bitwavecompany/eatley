@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
-import { Icon } from '@iconify/vue'
+import {
+  AlarmClock,
+  X,
+  AlertCircle,
+  Repeat,
+  BellRing,
+  CalendarDays,
+  Check,
+} from '@lucide/vue'
 import { DAYS_OF_WEEK, DEFAULT_ALARM_LABELS } from '@/config/constants'
 import type {
   Alarma,
@@ -56,7 +64,6 @@ watch(
 
 function toggleDay(dayId: number) {
   if (diasSemana.value.includes(dayId)) {
-    // Avoid leaving empty if possible
     if (diasSemana.value.length > 1) {
       diasSemana.value = diasSemana.value.filter((d) => d !== dayId)
     }
@@ -129,32 +136,32 @@ function handleSubmit() {
 <template>
   <div
     v-if="isOpen"
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm overflow-y-auto"
     @click.self="emit('close')"
   >
     <div
-      class="relative w-full max-w-lg rounded-3xl bg-slate-900 border border-slate-800 p-6 sm:p-7 shadow-2xl animate-in fade-in zoom-in-95 duration-150"
+      class="relative w-full max-w-lg rounded-3xl bg-white border border-slate-200 p-6 sm:p-7 shadow-2xl animate-in fade-in zoom-in-95 duration-150"
     >
       <!-- Header -->
-      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100">
         <div class="flex items-center gap-2.5">
-          <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
-            <Icon icon="lucide:alarm-clock" class="w-5 h-5" />
+          <div class="p-2 rounded-xl bg-emerald-50 text-emerald-600">
+            <AlarmClock class="w-5 h-5" />
           </div>
           <div>
-            <h3 class="text-lg font-bold text-white">
+            <h3 class="text-lg font-bold text-slate-900">
               {{ isEditing ? 'Editar Alarma' : 'Nueva Alarma de Comida' }}
             </h3>
-            <p class="text-xs text-slate-400">Configura la hora y repetición del dispensador</p>
+            <p class="text-xs text-slate-500">Configura la hora y repetición del dispensador</p>
           </div>
         </div>
 
         <button
           type="button"
           @click="emit('close')"
-          class="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+          class="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
         >
-          <Icon icon="lucide:x" class="w-5 h-5" />
+          <X class="w-5 h-5" />
         </button>
       </div>
 
@@ -163,15 +170,15 @@ function handleSubmit() {
         <!-- Error alert -->
         <div
           v-if="errorMessage"
-          class="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2"
+          class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2"
         >
-          <Icon icon="lucide:alert-circle" class="w-4 h-4 shrink-0" />
+          <AlertCircle class="w-4 h-4 shrink-0 text-rose-600" />
           <span>{{ errorMessage }}</span>
         </div>
 
         <!-- Big Hour Selector -->
         <div>
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
             Hora Programada
           </label>
           <div class="relative">
@@ -179,14 +186,14 @@ function handleSubmit() {
               type="time"
               v-model="hora"
               required
-              class="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-2xl px-5 py-4 text-3xl font-mono font-bold text-center text-white tracking-widest focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer"
+              class="w-full bg-slate-50 border border-slate-200 focus:bg-white focus:border-emerald-500 rounded-2xl px-5 py-4 text-3xl font-mono font-bold text-center text-slate-900 tracking-widest focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer shadow-inner"
             />
           </div>
         </div>
 
         <!-- Label & Presets -->
         <div>
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
             Etiqueta / Nombre
           </label>
           <input
@@ -194,7 +201,7 @@ function handleSubmit() {
             v-model="etiqueta"
             placeholder="Ej. Desayuno Michi, Almuerzo..."
             maxlength="40"
-            class="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
+            class="w-full bg-slate-50 border border-slate-200 focus:bg-white focus:border-emerald-500 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
           />
 
           <!-- Quick Presets -->
@@ -204,7 +211,7 @@ function handleSubmit() {
               :key="preset"
               type="button"
               @click="selectLabelPreset(preset)"
-              class="px-2.5 py-1 rounded-lg text-xs bg-slate-800/80 hover:bg-slate-800 text-slate-300 hover:text-emerald-400 border border-slate-700/60 transition-colors"
+              class="px-2.5 py-1 rounded-lg text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-emerald-700 border border-slate-200 transition-colors"
             >
               {{ preset }}
             </button>
@@ -213,7 +220,7 @@ function handleSubmit() {
 
         <!-- Repetition Mode Selector -->
         <div>
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
             Frecuencia de Repetición
           </label>
           <div class="grid grid-cols-3 gap-2">
@@ -223,11 +230,11 @@ function handleSubmit() {
               class="p-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1.5 transition-all text-center"
               :class="[
                 tipoRepeticion === 'dias_semana'
-                  ? 'bg-emerald-500/15 border-emerald-500 text-emerald-300'
-                  : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                  ? 'bg-emerald-50 border-emerald-500 text-emerald-800 shadow-sm'
+                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
               ]"
             >
-              <Icon icon="lucide:repeat" class="w-4 h-4" />
+              <Repeat class="w-4 h-4" />
               <span>Días de Semana</span>
             </button>
 
@@ -237,11 +244,11 @@ function handleSubmit() {
               class="p-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1.5 transition-all text-center"
               :class="[
                 tipoRepeticion === 'una_vez'
-                  ? 'bg-emerald-500/15 border-emerald-500 text-emerald-300'
-                  : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                  ? 'bg-emerald-50 border-emerald-500 text-emerald-800 shadow-sm'
+                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
               ]"
             >
-              <Icon icon="lucide:bell-ring" class="w-4 h-4" />
+              <BellRing class="w-4 h-4" />
               <span>Una Sola Vez</span>
             </button>
 
@@ -251,33 +258,33 @@ function handleSubmit() {
               class="p-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1.5 transition-all text-center"
               :class="[
                 tipoRepeticion === 'fecha_especifica'
-                  ? 'bg-emerald-500/15 border-emerald-500 text-emerald-300'
-                  : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                  ? 'bg-emerald-50 border-emerald-500 text-emerald-800 shadow-sm'
+                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
               ]"
             >
-              <Icon icon="lucide:calendar-days" class="w-4 h-4" />
+              <CalendarDays class="w-4 h-4" />
               <span>Fecha Calendario</span>
             </button>
           </div>
         </div>
 
         <!-- Mode 1: Days of Week Circular Pills & Shortcuts -->
-        <div v-if="tipoRepeticion === 'dias_semana'" class="space-y-3 p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800/80">
+        <div v-if="tipoRepeticion === 'dias_semana'" class="space-y-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
           <div class="flex items-center justify-between">
-            <span class="text-xs text-slate-400 font-medium">Selecciona los días:</span>
+            <span class="text-xs text-slate-600 font-medium">Selecciona los días:</span>
             <div class="flex items-center gap-2">
               <button
                 type="button"
                 @click="selectAllDays"
-                class="text-[11px] font-semibold text-emerald-400 hover:text-emerald-300 transition-colors"
+                class="text-[11px] font-semibold text-emerald-700 hover:text-emerald-800 transition-colors"
               >
                 Todos
               </button>
-              <span class="text-slate-700">|</span>
+              <span class="text-slate-300">|</span>
               <button
                 type="button"
                 @click="selectWeekdays"
-                class="text-[11px] font-semibold text-slate-400 hover:text-slate-200 transition-colors"
+                class="text-[11px] font-semibold text-slate-600 hover:text-slate-800 transition-colors"
               >
                 L a V
               </button>
@@ -293,8 +300,8 @@ function handleSubmit() {
               class="h-10 rounded-full text-xs font-bold transition-all flex flex-col items-center justify-center border"
               :class="[
                 diasSemana.includes(d.id)
-                  ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md shadow-emerald-500/20'
-                  : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700'
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                  : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
               ]"
             >
               <span>{{ d.letter }}</span>
@@ -303,22 +310,22 @@ function handleSubmit() {
         </div>
 
         <!-- Mode 3: Calendar Date Picker -->
-        <div v-else-if="tipoRepeticion === 'fecha_especifica'" class="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800/80">
-          <label class="block text-xs font-medium text-slate-400 mb-1.5">
+        <div v-else-if="tipoRepeticion === 'fecha_especifica'" class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+          <label class="block text-xs font-medium text-slate-600 mb-1.5">
             Fecha para la apertura
           </label>
           <input
             type="date"
             v-model="fechaEspecifica"
-            class="w-full bg-slate-900 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
+            class="w-full bg-white border border-slate-200 focus:border-emerald-500 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer shadow-sm"
           />
         </div>
 
         <!-- Active Switch -->
         <div class="flex items-center justify-between py-2 px-1">
           <div>
-            <span class="text-sm font-semibold text-white block">Estado inicial</span>
-            <span class="text-xs text-slate-400">Habilitar alarma inmediatamente tras guardar</span>
+            <span class="text-sm font-semibold text-slate-900 block">Estado inicial</span>
+            <span class="text-xs text-slate-500">Habilitar alarma inmediatamente tras guardar</span>
           </div>
           <button
             type="button"
@@ -326,7 +333,7 @@ function handleSubmit() {
             :aria-checked="activa"
             @click="activa = !activa"
             class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
-            :class="activa ? 'bg-emerald-500' : 'bg-slate-700'"
+            :class="activa ? 'bg-emerald-600' : 'bg-slate-300'"
           >
             <span
               class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
@@ -336,20 +343,20 @@ function handleSubmit() {
         </div>
 
         <!-- Footer Actions -->
-        <div class="pt-3 border-t border-slate-800 flex items-center justify-end gap-2.5">
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2.5">
           <button
             type="button"
             @click="emit('close')"
-            class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700/80 transition-colors"
+            class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors"
           >
             Cancelar
           </button>
 
           <button
             type="submit"
-            class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-950 bg-emerald-400 hover:bg-emerald-300 shadow-md shadow-emerald-500/20 transition-all flex items-center gap-1.5"
+            class="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5"
           >
-            <Icon icon="lucide:check" class="w-4 h-4" />
+            <Check class="w-4 h-4" />
             <span>{{ isEditing ? 'Actualizar Alarma' : 'Guardar Alarma' }}</span>
           </button>
         </div>

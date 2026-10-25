@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
+import { PawPrint, PauseCircle, Wifi, WifiLow, WifiZero, WifiOff } from '@lucide/vue'
 import { useDeviceStore } from '@/stores/useDeviceStore'
 import { useConfigStore } from '@/stores/useConfigStore'
 
@@ -8,23 +8,23 @@ const configStore = useConfigStore()
 </script>
 
 <template>
-  <header class="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+  <header class="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-slate-200 shadow-sm">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
       <!-- Brand & Name -->
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-          <Icon icon="lucide:paw-print" class="w-6 h-6 text-slate-950 font-bold" />
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center shadow-md shadow-emerald-500/20">
+          <PawPrint class="w-6 h-6 text-white stroke-[2.2]" />
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-xl font-extrabold tracking-tight text-white">
-              eat<span class="text-emerald-400">ley</span>
+            <h1 class="text-xl font-extrabold tracking-tight text-slate-900">
+              eat<span class="text-emerald-600">ley</span>
             </h1>
-            <span class="text-[10px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700/60">
+            <span class="text-[10px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
               ESP32
             </span>
           </div>
-          <p class="text-[11px] text-slate-400 hidden sm:block">Dispensador Automático</p>
+          <p class="text-[11px] text-slate-500 hidden sm:block">Dispensador Automático</p>
         </div>
       </div>
 
@@ -33,19 +33,19 @@ const configStore = useConfigStore()
         <!-- Global Pause Pill (if active) -->
         <div
           v-if="configStore.isSystemPaused"
-          class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-medium animate-pulse"
+          class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-300 text-amber-800 text-xs font-semibold animate-pulse"
         >
-          <Icon icon="lucide:pause-circle" class="w-3.5 h-3.5 shrink-0" />
+          <PauseCircle class="w-3.5 h-3.5 shrink-0 text-amber-600" />
           <span class="hidden sm:inline">Sistema</span> Pausado
         </div>
 
         <!-- ESP32 Connection Badge -->
         <div
-          class="flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium transition-all"
+          class="flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold transition-all shadow-sm"
           :class="[
             deviceStore.isOnline
-              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-              : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+              : 'bg-rose-50 border-rose-200 text-rose-800'
           ]"
         >
           <span class="relative flex h-2 w-2">
@@ -55,39 +55,41 @@ const configStore = useConfigStore()
             ></span>
             <span
               class="relative inline-flex rounded-full h-2 w-2"
-              :class="deviceStore.isOnline ? 'bg-emerald-500' : 'bg-rose-500'"
+              :class="deviceStore.isOnline ? 'bg-emerald-600' : 'bg-rose-600'"
             ></span>
           </span>
 
-          <span class="font-medium">
+          <span>
             {{ deviceStore.isOnline ? 'En línea' : 'Desconectado' }}
           </span>
 
           <!-- Wi-Fi Icon & Signal Info -->
           <div
             v-if="deviceStore.isOnline"
-            class="flex items-center gap-1 pl-1 border-l border-emerald-500/20 text-emerald-300"
+            class="flex items-center gap-1 pl-1 border-l border-emerald-200 text-emerald-700"
             :title="`Señal: ${deviceStore.estadoEsp32?.rssi_dbm ?? 0} dBm (${deviceStore.wifiLevel})`"
           >
-            <Icon
+            <Wifi
               v-if="deviceStore.wifiLevel === 'excelente' || deviceStore.wifiLevel === 'buena'"
-              icon="lucide:wifi"
               class="w-3.5 h-3.5"
             />
-            <Icon
+            <WifiLow
               v-else-if="deviceStore.wifiLevel === 'regular'"
-              icon="lucide:wifi-low"
               class="w-3.5 h-3.5"
             />
-            <Icon
+            <WifiZero
               v-else
-              icon="lucide:wifi-zero"
-              class="w-3.5 h-3.5 text-amber-400"
+              class="w-3.5 h-3.5 text-amber-600"
             />
             <span class="text-[10px] font-mono hidden md:inline">
               {{ deviceStore.estadoEsp32?.rssi_dbm }}dBm
             </span>
           </div>
+
+          <WifiOff
+            v-else
+            class="w-3.5 h-3.5 text-rose-500"
+          />
         </div>
       </div>
     </div>
