@@ -47,7 +47,7 @@ export function getFirebaseDb(): Database | null {
   if (!firebaseDbInstance) {
     const app = getFirebaseApp()
     if (app) {
-      firebaseDbInstance = getDatabase(app)
+      firebaseDbInstance = getDatabase(app, env.firebase.databaseURL)
     }
   }
 

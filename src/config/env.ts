@@ -16,9 +16,10 @@ export interface AppEnv {
   isFirebaseConfigured: boolean
 }
 
-const rawApiKey = import.meta.env.VITE_FIREBASE_API_KEY || ''
-const rawDbUrl = import.meta.env.VITE_FIREBASE_DATABASE_URL || ''
-const rawProjectId = import.meta.env.VITE_FIREBASE_PROJECT_ID || ''
+const rawApiKey = (import.meta.env.VITE_FIREBASE_API_KEY || '').trim()
+const rawDbUrl = (import.meta.env.VITE_FIREBASE_DATABASE_URL || '').trim()
+const cleanDbUrl = rawDbUrl.replace(/\/+$/, '')
+const rawProjectId = (import.meta.env.VITE_FIREBASE_PROJECT_ID || '').trim()
 
 /**
  * Checks if the string is still a placeholder or empty
@@ -36,21 +37,21 @@ function isPlaceholder(value: string): boolean {
 
 const isConfigured =
   !isPlaceholder(rawApiKey) &&
-  !isPlaceholder(rawDbUrl) &&
+  !isPlaceholder(cleanDbUrl) &&
   !isPlaceholder(rawProjectId) &&
-  rawDbUrl.startsWith('https://')
+  cleanDbUrl.startsWith('https://')
 
 export const env: AppEnv = {
   appName: import.meta.env.VITE_APP_NAME || 'eatley',
   timezone: import.meta.env.VITE_APP_TIMEZONE || 'America/Guayaquil',
   firebase: {
     apiKey: rawApiKey,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
-    databaseURL: rawDbUrl,
+    authDomain: (import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '').trim(),
+    databaseURL: cleanDbUrl,
     projectId: rawProjectId,
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || '',
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
-    appId: import.meta.env.VITE_FIREBASE_APP_ID || '',
+    storageBucket: (import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || '').trim(),
+    messagingSenderId: (import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '').trim(),
+    appId: (import.meta.env.VITE_FIREBASE_APP_ID || '').trim(),
     measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
   },
   firebaseRootPath: (import.meta.env.VITE_FIREBASE_ROOT_PATH || 'eatley_v1').replace(/^\/+|\/+$/g, ''),
