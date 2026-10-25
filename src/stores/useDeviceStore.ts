@@ -8,6 +8,7 @@ import type {
   ComandoAdmin,
   OrigenDisparoManual,
   NivelSenalWifi,
+  FirebaseConnectionState,
 } from '@/types/device.types'
 import type { Unsubscribe } from 'firebase/database'
 
@@ -16,13 +17,22 @@ export const useDeviceStore = defineStore('device', () => {
   const estadoEsp32 = ref<EstadoEsp32 | null>(null)
   const isInitialized = ref(false)
   const currentTime = ref(Date.now())
+  const isFirebaseConnected = ref<boolean>(false)
 
   // Internal unsubscribers
   let unsubDisparo: Unsubscribe | null = null
   let unsubEstado: Unsubscribe | null = null
+  let unsubFirebaseConn: Unsubscribe | null = null
   let timerInterval: ReturnType<typeof setInterval> | null = null
 
-  // Heartbeat tracking
+  // Cloud / Firebase connection status
+  const firebaseConnectionStatus = computed<FirebaseConnectionState>(() => {
+    if (isFirebaseConnected.value) return 'conectado'
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return 'desconectado'
+    return 'reconectando'
+  })
+
+  // Hardware / ESP32 Heartbeat tracking
   const isOnline = computed<boolean>(() => {
     if (!estadoEsp32.value?.ultima_conexion) return false
     const diffSec = (currentTime.value - estadoEsp32.value.ultima_conexion) / 1000
@@ -71,6 +81,10 @@ export const useDeviceStore = defineStore('device', () => {
       currentTime.value = Date.now()
     }, 1000)
 
+    unsubFirebaseConn = FeederRepository.subscribeToFirebaseConnection((connected) => {
+      isFirebaseConnected.value = connected
+    })
+
     unsubDisparo = FeederRepository.subscribeDisparoManual((data) => {
       disparoManual.value = data
     })
@@ -99,6 +113,7 @@ export const useDeviceStore = defineStore('device', () => {
   }
 
   onUnmounted(() => {
+    if (unsubFirebaseConn) unsubFirebaseConn()
     if (unsubDisparo) unsubDisparo()
     if (unsubEstado) unsubEstado()
     if (timerInterval) clearInterval(timerInterval)
@@ -108,6 +123,8 @@ export const useDeviceStore = defineStore('device', () => {
     disparoManual,
     estadoEsp32,
     isInitialized,
+    isFirebaseConnected,
+    firebaseConnectionStatus,
     isOnline,
     secondsSinceHeartbeat,
     wifiLevel,

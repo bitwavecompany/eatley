@@ -99,6 +99,22 @@ const localMock = new LocalMockStore()
  */
 export const FeederRepository = {
   // ==========================================
+  // CONEXIÓN NUBE / FIREBASE (.info/connected)
+  // ==========================================
+  subscribeToFirebaseConnection(callback: (isConnected: boolean) => void): Unsubscribe {
+    const db = getFirebaseDb()
+    if (!db) {
+      callback(false)
+      return () => {}
+    }
+
+    const connectedRef = ref(db, '.info/connected')
+    return onValue(connectedRef, (snap) => {
+      callback(snap.val() === true)
+    })
+  },
+
+  // ==========================================
   // DISPARO MANUAL
   // ==========================================
   subscribeDisparoManual(callback: (data: DisparoManual | null) => void): Unsubscribe {

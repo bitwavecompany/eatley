@@ -8,8 +8,10 @@ import {
   BellRing,
   CalendarDays,
   Check,
+  CloudOff,
 } from '@lucide/vue'
 import { DAYS_OF_WEEK, DEFAULT_ALARM_LABELS } from '@/config/constants'
+import { useDeviceStore } from '@/stores/useDeviceStore'
 import type {
   Alarma,
   AlarmaRepeticionTipo,
@@ -27,6 +29,8 @@ const emit = defineEmits<{
   (e: 'save-create', payload: CrearAlarmaPayload): void
   (e: 'save-update', data: { id: string; payload: ActualizarAlarmaPayload }): void
 }>()
+
+const deviceStore = useDeviceStore()
 
 const hora = ref('08:00')
 const etiqueta = ref('')
@@ -86,6 +90,11 @@ function selectLabelPreset(label: string) {
 
 function handleSubmit() {
   errorMessage.value = ''
+
+  if (!deviceStore.isFirebaseConnected) {
+    errorMessage.value = 'No se puede guardar: la conexión con la nube de Firebase no está activa.'
+    return
+  }
 
   if (!hora.value) {
     errorMessage.value = 'Debes ingresar una hora válida.'
@@ -174,6 +183,15 @@ function handleSubmit() {
         >
           <AlertCircle class="w-4 h-4 shrink-0 text-rose-600" />
           <span>{{ errorMessage }}</span>
+        </div>
+
+        <!-- Cloud Offline Warning Notice -->
+        <div
+          v-if="!deviceStore.isFirebaseConnected"
+          class="p-3 rounded-xl bg-amber-50 border border-amber-300 text-amber-800 text-xs flex items-center gap-2"
+        >
+          <CloudOff class="w-4 h-4 shrink-0 text-amber-600" />
+          <span>Sin conexión con la nube. Espera a que se restablezca el enlace WebSocket para guardar cambios.</span>
         </div>
 
         <!-- Big Hour Selector -->
@@ -354,7 +372,13 @@ function handleSubmit() {
 
           <button
             type="submit"
-            class="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5"
+            :disabled="!deviceStore.isFirebaseConnected"
+            class="px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+            :class="[
+              deviceStore.isFirebaseConnected
+                ? 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/20'
+                : 'bg-slate-400'
+            ]"
           >
             <Check class="w-4 h-4" />
             <span>{{ isEditing ? 'Actualizar Alarma' : 'Guardar Alarma' }}</span>

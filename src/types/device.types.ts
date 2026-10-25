@@ -18,3 +18,5 @@ export interface EstadoEsp32 {
 }
 
 export type NivelSenalWifi = 'excelente' | 'buena' | 'regular' | 'debil' | 'desconocida'
+
+export type FirebaseConnectionState = 'conectado' | 'reconectando' | 'desconectado'
