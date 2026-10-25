@@ -6,6 +6,7 @@ import { useConfigStore } from '@/stores/useConfigStore'
 import AlarmCard from '@/components/alarms/AlarmCard.vue'
 import AlarmModal from '@/components/alarms/AlarmModal.vue'
 import MissedAlarmBanner from '@/components/feeder/MissedAlarmBanner.vue'
+import ConfirmationModal from '@/components/common/ConfirmationModal.vue'
 import type { Alarma, CrearAlarmaPayload, ActualizarAlarmaPayload } from '@/types/alarm.types'
 
 const alarmsStore = useAlarmsStore()
@@ -13,6 +14,10 @@ const configStore = useConfigStore()
 
 const isModalOpen = ref(false)
 const selectedAlarm = ref<Alarma | null>(null)
+
+// Delete Confirmation Modal State
+const showConfirmDelete = ref(false)
+const alarmToDelete = ref<Alarma | null>(null)
 
 function openCreateModal() {
   selectedAlarm.value = null
@@ -36,10 +41,18 @@ function handleToggle(id: string) {
   void alarmsStore.toggleAlarma(id)
 }
 
-function handleDelete(id: string) {
-  if (confirm('¿Estás seguro de eliminar esta alarma?')) {
-    void alarmsStore.eliminarAlarma(id)
+function promptDelete(id: string) {
+  const found = alarmsStore.alarmas.find((a) => a.id === id) || null
+  alarmToDelete.value = found
+  showConfirmDelete.value = true
+}
+
+async function handleConfirmDelete() {
+  if (alarmToDelete.value) {
+    await alarmsStore.eliminarAlarma(alarmToDelete.value.id)
   }
+  showConfirmDelete.value = false
+  alarmToDelete.value = null
 }
 </script>
 
@@ -116,7 +129,7 @@ function handleDelete(id: string) {
         :alarma="alarma"
         @toggle="handleToggle"
         @edit="openEditModal"
-        @delete="handleDelete"
+        @delete="promptDelete"
       />
     </div>
 
@@ -127,6 +140,22 @@ function handleDelete(id: string) {
       @close="isModalOpen = false"
       @save-create="handleSaveCreate"
       @save-update="handleSaveUpdate"
+    />
+
+    <!-- Modal Confirmación de Eliminación de Alarma -->
+    <ConfirmationModal
+      :is-open="showConfirmDelete"
+      title="¿Eliminar Alarma?"
+      subtitle="Esta acción no se puede deshacer"
+      :description="
+        alarmToDelete
+          ? `¿Estás seguro de que deseas eliminar la alarma '${alarmToDelete.etiqueta}' programada a las ${alarmToDelete.hora}? El dispensador ya no se activará en ese horario.`
+          : '¿Estás seguro de que deseas eliminar esta alarma?'
+      "
+      confirm-text="Sí, eliminar"
+      cancel-text="Cancelar"
+      @close="showConfirmDelete = false"
+      @confirm="handleConfirmDelete"
     />
   </div>
 </template>

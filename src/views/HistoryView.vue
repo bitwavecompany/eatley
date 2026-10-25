@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { Trash2 } from '@lucide/vue'
 import { useHistoryStore } from '@/stores/useHistoryStore'
 import HistoryList from '@/components/history/HistoryList.vue'
+import ConfirmationModal from '@/components/common/ConfirmationModal.vue'
 import type { OrigenEvento } from '@/types/history.types'
 
 const historyStore = useHistoryStore()
@@ -138,44 +139,16 @@ async function handleClearHistory() {
       empty-message="No se encontraron eventos con el filtro seleccionado."
     />
 
-    <!-- Clear Confirmation Modal -->
-    <div
-      v-if="showConfirmClear"
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm"
-      @click.self="showConfirmClear = false"
-    >
-      <div class="w-full max-w-sm rounded-3xl bg-white border border-slate-200 p-6 shadow-2xl space-y-4">
-        <div class="flex items-center gap-3">
-          <div class="p-2.5 rounded-2xl bg-rose-100 text-rose-600">
-            <Trash2 class="w-6 h-6" />
-          </div>
-          <div>
-            <h4 class="font-bold text-slate-900 text-base">¿Limpiar Bitácora?</h4>
-            <p class="text-xs text-slate-500">Esta acción no se puede deshacer</p>
-          </div>
-        </div>
-
-        <p class="text-xs text-slate-600">
-          Se borrarán todos los registros históricos guardados en Firebase. Los nuevos eventos que ocurran se registrarán normalmente.
-        </p>
-
-        <div class="flex items-center justify-end gap-2 pt-2">
-          <button
-            type="button"
-            @click="showConfirmClear = false"
-            class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
-          >
-            Cancelar
-          </button>
-          <button
-            type="button"
-            @click="handleClearHistory"
-            class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 transition-colors"
-          >
-            Sí, borrar todo
-          </button>
-        </div>
-      </div>
-    </div>
+    <!-- Reusable Clear Confirmation Modal -->
+    <ConfirmationModal
+      :is-open="showConfirmClear"
+      title="¿Limpiar Bitácora?"
+      subtitle="Esta acción no se puede deshacer"
+      description="Se borrarán todos los registros históricos guardados en Firebase. Los nuevos eventos que ocurran se registrarán normalmente."
+      confirm-text="Sí, borrar todo"
+      cancel-text="Cancelar"
+      @close="showConfirmClear = false"
+      @confirm="handleClearHistory"
+    />
   </div>
 </template>

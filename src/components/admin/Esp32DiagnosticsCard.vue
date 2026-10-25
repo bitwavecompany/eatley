@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { Cpu, Info, Loader2, Power, AlertTriangle } from '@lucide/vue'
 import { useDeviceStore } from '@/stores/useDeviceStore'
+import ConfirmationModal from '@/components/common/ConfirmationModal.vue'
 
 const deviceStore = useDeviceStore()
 const showConfirmReboot = ref(false)
@@ -137,44 +138,17 @@ async function confirmReboot() {
       </div>
     </div>
 
-    <!-- Confirmation Modal -->
-    <div
-      v-if="showConfirmReboot"
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm"
-      @click.self="showConfirmReboot = false"
-    >
-      <div class="w-full max-w-sm rounded-3xl bg-white border border-slate-200 p-6 shadow-2xl space-y-4">
-        <div class="flex items-center gap-3">
-          <div class="p-2.5 rounded-2xl bg-rose-100 text-rose-600">
-            <AlertTriangle class="w-6 h-6" />
-          </div>
-          <div>
-            <h4 class="font-bold text-slate-900 text-base">¿Reiniciar ESP32?</h4>
-            <p class="text-xs text-slate-500">Se reiniciará el microcontrolador remoto</p>
-          </div>
-        </div>
-
-        <p class="text-xs text-slate-600">
-          Esta acción enviará la orden <code class="bg-slate-100 px-1 py-0.5 rounded text-amber-800 font-mono">reiniciar_esp32</code>. El microcontrolador ejecutará un reinicio suave (ESP.restart()) y volverá a conectarse a la red en unos segundos.
-        </p>
-
-        <div class="flex items-center justify-end gap-2 pt-2">
-          <button
-            type="button"
-            @click="showConfirmReboot = false"
-            class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
-          >
-            Cancelar
-          </button>
-          <button
-            type="button"
-            @click="confirmReboot"
-            class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 transition-colors"
-          >
-            Confirmar Reinicio
-          </button>
-        </div>
-      </div>
-    </div>
+    <!-- Reusable Confirmation Modal -->
+    <ConfirmationModal
+      :is-open="showConfirmReboot"
+      title="¿Reiniciar ESP32?"
+      subtitle="Se reiniciará el microcontrolador remoto"
+      description="Esta acción enviará la orden 'reiniciar_esp32' a Firebase. El microcontrolador ejecutará un reinicio suave (ESP.restart()) y volverá a conectarse a la red en unos segundos."
+      confirm-text="Confirmar Reinicio"
+      cancel-text="Cancelar"
+      :icon="AlertTriangle"
+      @close="showConfirmReboot = false"
+      @confirm="confirmReboot"
+    />
   </div>
 </template>
