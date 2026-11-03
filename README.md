@@ -7,44 +7,62 @@
 ## 🚀 1. Arquitectura del Sistema IoT
 
 ```
-┌────────────────────────────────────────┐
-│     eatley Web SPA (Vue 3 + TS)        │
-│  - Control manual con cooldown         │
-│  - Programación tipo alarma de celular │
-│  - Calibración de servo MG996R         │
-│  - Telemetría y detección de cortes    │
-└──────────────────┬─────────────────────┘
-                   │
-                   │ WebSockets / SSL
-                   ▼
-┌────────────────────────────────────────┐
-│     Firebase Realtime Database         │
-│  - Nodo raíz: `eatley_v1/`             │
-│  - Sincronización bidireccional <100ms │
-└──────────────────▲─────────────────────┘
-                   │
-                   │ Wi-Fi 802.11 b/g/n (Firebase RTDB Client)
-                   ▼
-┌────────────────────────────────────────┐
-│     ESP32 NodeMCU (38 Pines)           │
-│  - GPIO 18 -> PWM Servomotor MG996R    │
-│  - GPIO 21 -> Microswitch fin de carrera│
-│  - Heartbeat continuo (cada 10s)       │
-└────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────┐
+│             eatley Web SPA (Vue 3 + TS)                │
+│  - Interfaz en Modo Claro (Tailwind CSS + Lucide)      │
+│  - Monitoreo Dual: Nube (.info/connected) y ESP32      │
+│  - Control manual con cooldown anti-doble clic         │
+│  - Programación tipo alarma de celular (3 modos)       │
+│  - Calibración en caliente del servo MG996R            │
+│  - Detección y recuperación de alarmas perdidas        │
+└───────────────────────────┬────────────────────────────┘
+                            │
+                            │ WebSockets / SSL (RTDB Client)
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│             Firebase Realtime Database                 │
+│  - Proyecto: `<tu-proyecto-firebase>`                  │
+│  - URL: `https://<tu-proyecto>-default-rtdb...`        │
+│  - Nodo raíz: `eatley_v1/`                             │
+│  - Latencia bidireccional <100ms                       │
+└───────────────────────────▲────────────────────────────┘
+                            │
+                            │ Wi-Fi 802.11 b/g/n (Firebase ESP Client)
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│             ESP32 NodeMCU (38 Pines)                   │
+│  - GPIO 18 -> PWM Servomotor MG996R (50 Hz)            │
+│  - GPIO 21 -> Microswitch fin de carrera (Pull-up)     │
+│  - Heartbeat continuo (cada 10 segundos)               │
+│  - Detección de cortes eléctricos y recuperación       │
+└────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🛠️ 2. Requisitos Previos e Instalación
+## 🌐 2. Monitoreo Dual de Conectividad
+
+La aplicación separa de forma conceptual y visual el estado de la **Nube** frente al del **Hardware Físico**:
+
+| Estado | Indicador | Fuente de Verdad | Comportamiento en la UI |
+|---|---|---|---|
+| **Nube (Firebase)** | Badge `Cloud` | Nodo nativo `/.info/connected` | Detecta en milisegundos si el navegador web tiene enlace activo con Firebase. Si se cae, bloquea temporalmente el disparo manual y creación de alarmas mostrando *"Reconectando con la nube..."*. |
+| **Dispositivo (ESP32)** | Badge `Cpu` + señal Wi-Fi | `estado_esp32/ultima_conexion` | Evalúa si el microcontrolador físico está encendido y transmitiendo según el umbral de `VITE_ESP32_OFFLINE_THRESHOLD_SEC` (45s). |
+
+---
+
+## 🛠️ 3. Requisitos Previos e Instalación
 
 ### Requisitos:
 * **Node.js**: v18.x o superior (recomendado v20+ LTS).
 * **NPM**: v9.x o superior.
+* **Git**: Para control de versiones.
 
 ### Pasos de Instalación:
 
-1. **Clonar o abrir el repositorio**:
+1. **Clonar el repositorio**:
    ```bash
+   git clone git@github.com:bitwavecompany/eatley.git
    cd eatley
    ```
 
@@ -53,28 +71,33 @@
    npm install
    ```
 
-3. **Configurar Variables de Entorno**:
-   Copia el archivo `.env.example` como `.env`:
+3. **Configurar Variables de Entorno (`.env`)**:
+   Copia el archivo `.env.example` a un archivo local `.env` (el archivo `.env` está protegido en `.gitignore` para no exponer credenciales):
    ```bash
    cp .env.example .env
    ```
-   Rellena tus credenciales del proyecto Firebase en `.env`:
+   Rellena tus credenciales obtenidas desde la Consola de Firebase (*Configuración del proyecto > General > Tus apps*):
    ```env
+   # Configuración General de la Aplicación
    VITE_APP_NAME=eatley
    VITE_APP_TIMEZONE=America/Guayaquil
 
-   VITE_FIREBASE_API_KEY=AIzaSy...
-   VITE_FIREBASE_AUTH_DOMAIN=mi-proyecto.firebaseapp.com
-   VITE_FIREBASE_DATABASE_URL=https://mi-proyecto-default-rtdb.firebaseio.com
-   VITE_FIREBASE_PROJECT_ID=mi-proyecto
-   VITE_FIREBASE_STORAGE_BUCKET=mi-proyecto.appspot.com
-   VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
-   VITE_FIREBASE_APP_ID=1:123456789:web:abcdef
+   # Credenciales de Firebase (Reemplaza con los valores de tu consola Firebase)
+   VITE_FIREBASE_API_KEY=REPLACE_WITH_FIREBASE_API_KEY
+   VITE_FIREBASE_AUTH_DOMAIN=REPLACE_WITH_PROJECT_ID.firebaseapp.com
+   VITE_FIREBASE_DATABASE_URL=https://REPLACE_WITH_PROJECT_ID-default-rtdb.firebaseio.com/
+   VITE_FIREBASE_PROJECT_ID=REPLACE_WITH_PROJECT_ID
+   VITE_FIREBASE_STORAGE_BUCKET=REPLACE_WITH_PROJECT_ID.firebasestorage.app
+   VITE_FIREBASE_MESSAGING_SENDER_ID=REPLACE_WITH_SENDER_ID
+   VITE_FIREBASE_APP_ID=REPLACE_WITH_APP_ID
+   VITE_FIREBASE_MEASUREMENT_ID=REPLACE_WITH_MEASUREMENT_ID
 
+   # Nodo raíz en Firebase Realtime Database
    VITE_FIREBASE_ROOT_PATH=eatley_v1
+
+   # Umbral de desconexión del ESP32 en segundos (heartbeat)
    VITE_ESP32_OFFLINE_THRESHOLD_SEC=45
    ```
-   > **Nota de Modo Demo:** Si dejas los placeholders por defecto (`REPLACE_WITH_...`), la aplicación arranca en un modo de prueba local seguro en memoria con aviso discreto superior, permitiendo testear toda la interfaz.
 
 4. **Ejecutar en Entorno de Desarrollo**:
    ```bash
@@ -88,9 +111,9 @@
 
 ---
 
-## 📡 3. Estructura de Datos en Firebase Realtime Database
+## 📡 4. Estructura de Datos en Firebase Realtime Database
 
-Todos los nodos cuelgan de la ruta raíz parametrizada `VITE_FIREBASE_ROOT_PATH` (por defecto `eatley_v1`):
+Todos los datos se sincronizan bajo la ruta raíz definida en `VITE_FIREBASE_ROOT_PATH` (por defecto `eatley_v1`):
 
 ### 1. `disparo_manual`
 ```json
@@ -100,7 +123,7 @@ Todos los nodos cuelgan de la ruta raíz parametrizada `VITE_FIREBASE_ROOT_PATH`
   "origen_solicitud": "boton_principal"
 }
 ```
-* `pendiente` (`boolean`): La web lo pasa a `true` al pulsar "Alimentar ahora". El ESP32 ejecuta el giro y lo regresa a `false`.
+* `pendiente` (`boolean`): El frontend lo pone en `true` al pulsar "Alimentar ahora". El ESP32 ejecuta el ciclo mecánico y lo restablece en `false`.
 * `solicitado_en` (`number`): Timestamp Unix en milisegundos.
 * `origen_solicitud` (`string`): `'boton_principal' | 'recuperacion_alarma_perdida'`.
 
@@ -120,7 +143,7 @@ Todos los nodos cuelgan de la ruta raíz parametrizada `VITE_FIREBASE_ROOT_PATH`
 }
 ```
 * `tipo_repeticion`: `'dias_semana' | 'una_vez' | 'fecha_especifica'`.
-* `dias_semana`: Array con días (0 = Domingo a 6 = Sábado).
+* `dias_semana`: Array numérico (`0` = Domingo a `6` = Sábado).
 
 ### 3. `configuracion`
 ```json
@@ -136,6 +159,7 @@ Todos los nodos cuelgan de la ruta raíz parametrizada `VITE_FIREBASE_ROOT_PATH`
   "usar_microswitch": false
 }
 ```
+* Modificable desde la vista de **Ajustes** en tiempo real sin reprogramar el microcontrolador.
 
 ### 4. `estado_esp32`
 ```json
@@ -148,7 +172,7 @@ Todos los nodos cuelgan de la ruta raíz parametrizada `VITE_FIREBASE_ROOT_PATH`
   "comando_admin": "ninguno"
 }
 ```
-* `comando_admin`: `'ninguno' | 'probar_servo' | 'reiniciar_esp32'`.
+* `comando_admin`: `'ninguno' | 'probar_servo' | 'reiniciar_esp32'`. El frontend escribe el comando y el ESP32 lo retorna a `'ninguno'` tras ejecutarlo.
 
 ### 5. `historial/{eventoId}`
 ```json
@@ -165,26 +189,43 @@ Todos los nodos cuelgan de la ruta raíz parametrizada `VITE_FIREBASE_ROOT_PATH`
 
 ---
 
-## ⚡ 4. Mapa Seguro de Pines para ESP32 NodeMCU (38 Pines)
+## ⚡ 5. Mapa Seguro de Pines para ESP32 NodeMCU (38 Pines)
 
-El microcontrolador **ESP32 NodeMCU de 38 pines (ESP-WROOM-32)** dispone de líneas de E/S dedicadas:
+Distribución de pines recomendada para la placa **ESP-WROOM-32 (38 pines)**:
 
-| Componente | Pin del ESP32 | Etiqueta en Placa | Notas Eléctricas |
+| Componente | Pin ESP32 | Serigrafía | Notas de Cableado y Conexión |
 |---|---|---|---|
-| **PWM Servomotor MG996R** | `GPIO 18` | `G18` | Señal PWM de 50Hz (Cable naranja del servo). |
-| **Alimentación Servo** | `5V / VIN` | `VIN` | El MG996R requiere fuente de al menos 5V/2A externa con GND común. |
-| **GND Común** | `GND` | `GND` | Unir GND de fuente externa con GND del ESP32. |
-| **Microswitch (Opcional)** | `GPIO 21` | `G21` | Configurado con `INPUT_PULLUP` interno hacia GND al presionar. |
+| **PWM Servomotor MG996R** | `GPIO 18` | `G18` | Señal PWM de control (cable naranja/amarillo del servo). |
+| **Alimentación Servomotor** | Fuente Externa | `5V / 2A` | **NO alimentar el MG996R directo del pin 3V3 o 5V del ESP32** (picos de corriente reinician la placa). Usar fuente externa de 5V y compartir GND. |
+| **GND Común** | `GND` | `GND` | Conectar GND de la fuente externa con el pin GND del ESP32. |
+| **Microswitch Fin de Carrera** | `GPIO 21` | `G21` | Configurado con `INPUT_PULLUP` interno al pin GPIO 21; el otro terminal va a GND. |
 
-⚠️ **ATENCIÓN - Pines Prohibidos:**
-* **NO usar** `GPIO 6` a `GPIO 11` (`CLK`, `CMD`, `SD0`, `SD1`, `SD2`, `SD3`), ya que están conectados internamente a la memoria Flash SPI del ESP32. Usarlos provocará un reinicio cíclico en bucle (*Kernel Panic / Boot Loop*).
-* **NO usar** `GPIO 34, 35, 36, 39` para el servomotor porque son pines de entrada exclusiva (sin driver de salida).
+⚠️ **Pines Prohibidos / Reservados:**
+* **`GPIO 6` a `GPIO 11` (`CLK`, `CMD`, `SD0`, `SD1`, `SD2`, `SD3`)**: Conectados a la memoria Flash SPI interna. Usarlos produce bloqueo inmediato (*Boot Loop*).
+* **`GPIO 34, 35, 36, 39`**: Pines solo de entrada (sin etapa de salida PWM).
 
 ---
 
-## 📄 5. Scripts Disponibles
+## 🎨 6. Diseño y Experiencia de Usuario (UI/UX)
 
-* `npm run dev`: Inicia el servidor de desarrollo Vite con Hot Module Replacement (HMR).
-* `npm run build`: Ejecuta chequeo estricto de tipos con `vue-tsc` y compila la SPA a `dist/`.
-* `npm run type-check`: Ejecuta validación de TypeScript sin emitir archivos.
-* `npm run preview`: Previsualiza localmente el build de producción en `dist/`.
+* **Tema Claro:** Paleta limpia basada en `slate-50` (fondo), `white` (tarjetas elevadas con bordes `slate-200`), acentos funcionales en `emerald-600` (acciones principales y estado online), `amber-500` (pausa/advertencias) y `rose-600` (alarmas perdidas/eliminación).
+* **Iconos Ligeros:** Migrado a `@lucide/vue` mediante importaciones tree-shakeable.
+* **Modales Reutilizables:** Implementación de `ConfirmationModal.vue` para eliminación de alarmas, vaciado de bitácora y reinicio remoto del microcontrolador (eliminando alertas nativas intrusivas).
+
+---
+
+## 📄 7. Scripts Disponibles
+
+```bash
+# Servidor local de desarrollo Vite con Hot Reload
+npm run dev
+
+# Chequeo estricto de tipos TypeScript sin emitir archivos
+npm run type-check
+
+# Compilación de producción optimizada (vue-tsc + vite build)
+npm run build
+
+# Previsualización local del artefacto generado en dist/
+npm run preview
+```
