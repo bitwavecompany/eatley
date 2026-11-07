@@ -17,7 +17,7 @@ withDefaults(
     emptyMessage?: string
   }>(),
   {
-    emptyMessage: 'No hay registros de apertura en la bitácora.',
+    emptyMessage: 'No hay registros de alimentación.',
   }
 )
 
