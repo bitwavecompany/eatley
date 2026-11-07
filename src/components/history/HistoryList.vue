@@ -107,7 +107,7 @@ function formatTimestamp(ts: number): { time: string; date: string } {
             <span>•</span>
             <span>{{ formatTimestamp(ev.timestamp).date }}</span>
             <span>•</span>
-            <span class="text-slate-500">Pulso: {{ ev.duracion_abierto_ms }}ms</span>
+            <span class="text-slate-500">Duración: {{ ev.duracion_abierto_ms }}ms</span>
           </div>
         </div>
       </div>

@@ -70,14 +70,14 @@ const historyStore = useHistoryStore()
       <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
         <div class="flex items-center gap-2.5">
           <History class="w-5 h-5 text-slate-500" />
-          <h3 class="font-bold text-slate-900 text-base">Última vez que comio</h3>
+          <h3 class="font-bold text-slate-900 text-base">Última Comida</h3>
         </div>
 
         <RouterLink
           :to="APP_ROUTES.HISTORY"
           class="text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 transition-colors"
         >
-          <span>Ver historial completo</span>
+          <span>Ver historial</span>
           <ArrowRight class="w-3.5 h-3.5" />
         </RouterLink>
       </div>

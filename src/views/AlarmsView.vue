@@ -63,8 +63,14 @@ async function handleConfirmDelete() {
 
     <!-- Top Header -->
     <div class="flex items-center justify-between gap-4">
-      <div class="flex items-center gap-2.5">
+      <div>
         <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Programar Alimentación</h2>
+        <p
+          v-if="alarmsStore.proximaAlarma"
+          class="text-xs sm:text-sm font-semibold text-emerald-700 mt-1"
+        >
+          Próxima ración en {{ Math.floor(alarmsStore.proximaAlarma.minutosRestantes / 60) }}h {{ alarmsStore.proximaAlarma.minutosRestantes % 60 }}m
+        </p>
       </div>
 
       <!-- Botón original para pantallas medianas/escritorio -->
@@ -133,6 +139,7 @@ async function handleConfirmDelete() {
       @close="isModalOpen = false"
       @save-create="handleSaveCreate"
       @save-update="handleSaveUpdate"
+      @delete="promptDelete"
     />
 
     <!-- Modal Confirmación de Eliminación de Alarma -->
