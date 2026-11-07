@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed } from 'vue'
 import { FeederRepository } from '@/services/feeder.repository'
 import { useDeviceStore } from './useDeviceStore'
 import type {
@@ -141,9 +141,10 @@ export const useAlarmsStore = defineStore('alarms', () => {
     await deviceStore.triggerManualFeed('recuperacion_alarma_perdida')
   }
 
-  onUnmounted(() => {
+  function destroy() {
     if (unsub) unsub()
-  })
+    isInitialized.value = false
+  }
 
   return {
     alarmas,
@@ -152,6 +153,7 @@ export const useAlarmsStore = defineStore('alarms', () => {
     proximaAlarma,
     isInitialized,
     init,
+    destroy,
     crearAlarma,
     actualizarAlarma,
     toggleAlarma,

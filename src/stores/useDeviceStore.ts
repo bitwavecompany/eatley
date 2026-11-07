@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed } from 'vue'
 import { FeederRepository } from '@/services/feeder.repository'
 import { env } from '@/config/env'
 import type {
@@ -112,12 +112,13 @@ export const useDeviceStore = defineStore('device', () => {
     await sendAdminCommand('probar_servo')
   }
 
-  onUnmounted(() => {
+  function destroy() {
     if (unsubFirebaseConn) unsubFirebaseConn()
     if (unsubDisparo) unsubDisparo()
     if (unsubEstado) unsubEstado()
     if (timerInterval) clearInterval(timerInterval)
-  })
+    isInitialized.value = false
+  }
 
   return {
     disparoManual,
@@ -132,6 +133,7 @@ export const useDeviceStore = defineStore('device', () => {
     activeAdminCommand,
     uptimeFormatted,
     init,
+    destroy,
     triggerManualFeed,
     sendAdminCommand,
     rebootEsp32,

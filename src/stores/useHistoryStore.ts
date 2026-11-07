@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed } from 'vue'
 import { FeederRepository } from '@/services/feeder.repository'
 import type { EventoHistorial } from '@/types/history.types'
 import type { Unsubscribe } from 'firebase/database'
@@ -34,9 +34,10 @@ export const useHistoryStore = defineStore('history', () => {
     await FeederRepository.limpiarHistorial()
   }
 
-  onUnmounted(() => {
+  function destroy() {
     if (unsub) unsub()
-  })
+    isInitialized.value = false
+  }
 
   return {
     historial,
@@ -45,6 +46,7 @@ export const useHistoryStore = defineStore('history', () => {
     totalEventos,
     eventosHoy,
     init,
+    destroy,
     limpiarHistorial,
   }
 })

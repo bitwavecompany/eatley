@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed } from 'vue'
 import { FeederRepository, DEFAULT_CONFIGURACION } from '@/services/feeder.repository'
 import type {
   ConfiguracionDispositivo,
@@ -41,9 +41,10 @@ export const useConfigStore = defineStore('config', () => {
     })
   }
 
-  onUnmounted(() => {
+  function destroy() {
     if (unsub) unsub()
-  })
+    isInitialized.value = false
+  }
 
   return {
     configuracion,
@@ -54,6 +55,7 @@ export const useConfigStore = defineStore('config', () => {
     blackoutToleranceMin,
     usesMicroswitch,
     init,
+    destroy,
     actualizarConfiguracion,
     togglePausaGlobal,
   }

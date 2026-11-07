@@ -29,16 +29,16 @@ function openEditModal(alarma: Alarma) {
   isModalOpen.value = true
 }
 
-function handleSaveCreate(payload: CrearAlarmaPayload) {
-  void alarmsStore.crearAlarma(payload)
+async function handleSaveCreate(payload: CrearAlarmaPayload) {
+  await alarmsStore.crearAlarma(payload)
 }
 
-function handleSaveUpdate(data: { id: string; payload: ActualizarAlarmaPayload }) {
-  void alarmsStore.actualizarAlarma(data.id, data.payload)
+async function handleSaveUpdate(data: { id: string; payload: ActualizarAlarmaPayload }) {
+  await alarmsStore.actualizarAlarma(data.id, data.payload)
 }
 
-function handleToggle(id: string) {
-  void alarmsStore.toggleAlarma(id)
+async function handleToggle(id: string) {
+  await alarmsStore.toggleAlarma(id)
 }
 
 function promptDelete(id: string) {

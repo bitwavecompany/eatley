@@ -54,6 +54,10 @@ async function handleConfirmLogout() {
   showLogoutModal.value = false
   if (auth) {
     try {
+      deviceStore.destroy()
+      alarmsStore.destroy()
+      configStore.destroy()
+      historyStore.destroy()
       await signOut(auth)
       // Redirigir al home y recargar la ventana para reiniciar completamente el estado reactivo y sockets
       window.location.href = APP_ROUTES.DASHBOARD
