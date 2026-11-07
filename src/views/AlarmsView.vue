@@ -66,6 +66,16 @@ async function handleConfirmDelete() {
       <div class="flex items-center gap-2.5">
         <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Programar Alimentación</h2>
       </div>
+
+      <!-- Botón original para pantallas medianas/escritorio -->
+      <button
+        type="button"
+        @click="openCreateModal"
+        class="hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-2xl font-bold text-sm text-white bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-600/20 active:scale-95 transition-all"
+      >
+        <Plus class="w-5 h-5" />
+        <span>Nueva Alarma</span>
+      </button>
     </div>
 
     <!-- Global Pause Alert Warning (if paused) -->
@@ -141,11 +151,11 @@ async function handleConfirmDelete() {
       @confirm="handleConfirmDelete"
     />
 
-    <!-- Botón Flotante de Nueva Alarma (Estilo WhatsApp) -->
+    <!-- Botón Flotante de Nueva Alarma (Solo móvil, estilo WhatsApp) -->
     <button
       type="button"
       @click="openCreateModal"
-      class="fixed bottom-20 right-5 sm:bottom-22 sm:right-8 z-30 w-14 h-14 rounded-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white shadow-xl shadow-emerald-600/35 flex items-center justify-center transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-emerald-500/30 cursor-pointer"
+      class="sm:hidden fixed bottom-20 right-5 z-30 w-14 h-14 rounded-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white shadow-xl shadow-emerald-600/35 flex items-center justify-center transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-emerald-500/30 cursor-pointer"
       title="Nueva Alarma"
       aria-label="Nueva Alarma"
     >
