@@ -11,7 +11,6 @@ import {
   EyeOff,
   AlertCircle,
   Loader2,
-  KeyRound,
 } from '@lucide/vue'
 
 const pin = ref('')
@@ -153,7 +152,6 @@ async function handlePinSubmit() {
           class="w-full py-3.5 px-5 rounded-2xl font-bold text-sm tracking-wide text-white bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed select-none"
         >
           <Loader2 v-if="cargando" class="w-4 h-4 animate-spin" />
-          <KeyRound v-else class="w-4 h-4" />
           <span>{{ cargando ? 'Verificando PIN...' : 'Ingresar' }}</span>
         </button>
       </form>
