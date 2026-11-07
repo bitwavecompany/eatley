@@ -39,6 +39,17 @@ export const SERVO_CONSTRAINTS = {
 } as const
 
 /**
+ * Recommended Default Values for Servo Calibration
+ */
+export const SERVO_RECOMMENDED_DEFAULTS = {
+  ANGULO_CERRADO: 0,
+  ANGULO_ABIERTO: 50,
+  TIEMPO_ABIERTO_MS: 350,
+  ACTIVAR_SACUDIDA: false,
+  DESACTIVAR_PULSO: true,
+} as const
+
+/**
  * Operational Contingency Rules
  */
 export const OPERATIONAL_CONSTRAINTS = {

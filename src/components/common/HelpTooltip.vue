@@ -22,7 +22,7 @@ function toggle() {
   isOpen.value = !isOpen.value
 }
 
-function handleClickOutside(event: MouseEvent) {
+function handlePointerDownOutside(event: Event) {
   if (containerRef.value && !containerRef.value.contains(event.target as Node)) {
     isOpen.value = false
   }
@@ -35,15 +35,17 @@ const alignClass = computed(() => {
 })
 
 const positionClass = computed(() => {
-  return props.position === 'bottom' ? 'top-full mt-1.5' : 'bottom-full mb-1.5'
+  return props.position === 'bottom' ? 'top-full mt-2' : 'bottom-full mb-2'
 })
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
+  document.addEventListener('pointerdown', handlePointerDownOutside)
+  document.addEventListener('touchstart', handlePointerDownOutside, { passive: true })
 })
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
+  document.removeEventListener('pointerdown', handlePointerDownOutside)
+  document.removeEventListener('touchstart', handlePointerDownOutside)
 })
 </script>
 
@@ -57,10 +59,11 @@ onUnmounted(() => {
     <button
       type="button"
       @click.stop="toggle"
-      class="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/20 cursor-pointer"
-      :aria-label="title || 'Información de diagnóstico'"
+      class="inline-flex items-center justify-center p-1.5 sm:p-1 -m-0.5 rounded-full text-slate-400 hover:text-slate-600 active:text-emerald-600 hover:bg-slate-200/60 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/20 cursor-pointer touch-manipulation"
+      :aria-label="title || 'Información de ayuda'"
+      :aria-expanded="isOpen"
     >
-      <HelpCircle class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+      <HelpCircle class="w-4 h-4" />
     </button>
 
     <transition
@@ -73,7 +76,7 @@ onUnmounted(() => {
     >
       <div
         v-if="isOpen"
-        class="absolute z-30 w-64 sm:w-72 p-3.5 rounded-2xl bg-white text-slate-700 text-xs leading-relaxed shadow-xl shadow-slate-900/10 border border-slate-200 pointer-events-auto"
+        class="absolute z-40 w-64 sm:w-72 max-w-[calc(100vw-2.5rem)] p-3.5 rounded-2xl bg-white text-slate-700 text-xs leading-relaxed shadow-xl shadow-slate-900/10 border border-slate-200 pointer-events-auto"
         :class="[positionClass, alignClass]"
         role="tooltip"
       >

@@ -73,16 +73,16 @@ async function handleSave() {
         <p class="text-xs text-slate-500 mb-2">
           Ventana de gracia: si la luz regresa dentro de este tiempo después de una alarma, el ESP32 la dispensará de inmediato; si pasa más tiempo, generará alerta de alarma perdida.
         </p>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3 sm:gap-4 mt-2">
           <input
             type="range"
             v-model.number="toleranciaApagon"
             :min="OPERATIONAL_CONSTRAINTS.TOLERANCIA_APAGON_MIN.MIN"
             :max="OPERATIONAL_CONSTRAINTS.TOLERANCIA_APAGON_MIN.MAX"
             :step="OPERATIONAL_CONSTRAINTS.TOLERANCIA_APAGON_MIN.STEP"
-            class="flex-1 accent-amber-500"
+            class="w-full h-11 py-3 cursor-pointer accent-amber-500 bg-transparent flex-1 touch-manipulation"
           />
-          <span class="text-xs font-mono text-slate-400 w-16 text-right">1m - 120m</span>
+          <span class="text-xs font-mono font-medium text-slate-400 w-20 sm:w-24 text-right shrink-0 whitespace-nowrap">1m - 120m</span>
         </div>
       </div>
 
@@ -99,24 +99,27 @@ async function handleSave() {
         <p class="text-xs text-slate-500 mb-2">
           Tiempo en segundos que se bloquea el botón en la interfaz tras dispensar para evitar sobrealimentar por error.
         </p>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3 sm:gap-4 mt-2">
           <input
             type="range"
             v-model.number="cooldownSeg"
             :min="OPERATIONAL_CONSTRAINTS.COOLDOWN_MANUAL_SEG.MIN"
             :max="OPERATIONAL_CONSTRAINTS.COOLDOWN_MANUAL_SEG.MAX"
             :step="OPERATIONAL_CONSTRAINTS.COOLDOWN_MANUAL_SEG.STEP"
-            class="flex-1"
+            class="w-full h-11 py-3 cursor-pointer accent-emerald-600 bg-transparent flex-1 touch-manipulation"
           />
-          <span class="text-xs font-mono text-slate-400 w-16 text-right">3s - 60s</span>
+          <span class="text-xs font-mono font-medium text-slate-400 w-20 sm:w-24 text-right shrink-0 whitespace-nowrap">3s - 60s</span>
         </div>
       </div>
 
       <!-- Switches -->
-      <div class="pt-4 border-t border-slate-100 space-y-4">
+      <div class="pt-4 border-t border-slate-100 space-y-3.5">
         <!-- Modo Pausa Global -->
-        <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
-          <div>
+        <div
+          @click="sistemaPausado = !sistemaPausado"
+          class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-200 hover:bg-slate-100/70 transition-colors cursor-pointer select-none"
+        >
+          <div class="pr-3">
             <span class="text-sm font-semibold text-slate-900 block">Pausa global del sistema (vacaciones)</span>
             <span class="text-xs text-slate-500">Congela la ejecución de todas las alarmas programadas sin borrarlas. El botón manual sigue disponible.</span>
           </div>
@@ -124,20 +127,22 @@ async function handleSave() {
             type="button"
             role="switch"
             :aria-checked="sistemaPausado"
-            @click="sistemaPausado = !sistemaPausado"
-            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+            class="relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-amber-500/20"
             :class="sistemaPausado ? 'bg-amber-500' : 'bg-slate-300'"
           >
             <span
-              class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+              class="pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
               :class="sistemaPausado ? 'translate-x-5' : 'translate-x-0'"
             />
           </button>
         </div>
 
         <!-- Soporte Microswitch -->
-        <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
-          <div>
+        <div
+          @click="usarMicroswitch = !usarMicroswitch"
+          class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-200 hover:bg-slate-100/70 transition-colors cursor-pointer select-none"
+        >
+          <div class="pr-3">
             <span class="text-sm font-semibold text-slate-900 block">Verificación física por microswitch (GPIO21)</span>
             <span class="text-xs text-slate-500">Activa la comprobación mecánica del recorrido de la compuerta para registrar atascos en el historial.</span>
           </div>
@@ -145,12 +150,11 @@ async function handleSave() {
             type="button"
             role="switch"
             :aria-checked="usarMicroswitch"
-            @click="usarMicroswitch = !usarMicroswitch"
-            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+            class="relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
             :class="usarMicroswitch ? 'bg-emerald-600' : 'bg-slate-300'"
           >
             <span
-              class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+              class="pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
               :class="usarMicroswitch ? 'translate-x-5' : 'translate-x-0'"
             />
           </button>
@@ -158,7 +162,7 @@ async function handleSave() {
       </div>
 
       <!-- Action Footer -->
-      <div class="pt-4 flex items-center justify-between">
+      <div class="pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <span v-if="saveSuccess" class="text-xs font-semibold text-emerald-700 flex items-center gap-1.5">
           <CheckCircle class="w-4 h-4 text-emerald-600" />
           ¡Reglas operativas actualizadas en Firebase!
@@ -169,7 +173,7 @@ async function handleSave() {
           type="button"
           @click="handleSave"
           :disabled="configStore.isSaving"
-          class="px-5 py-2.5 rounded-xl font-bold text-sm text-white bg-emerald-600 hover:bg-emerald-500 shadow-md shadow-emerald-600/20 transition-all flex items-center gap-2"
+          class="w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-xl font-bold text-sm text-white bg-emerald-600 hover:bg-emerald-500 shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 touch-manipulation cursor-pointer"
         >
           <Loader2
             v-if="configStore.isSaving"
