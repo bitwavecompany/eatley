@@ -6,7 +6,6 @@ import {
   ArrowLeft,
   ChevronRight,
   Trash2,
-  CalendarDays,
   AlertCircle,
 } from '@lucide/vue'
 import { DAYS_OF_WEEK } from '@/config/constants'
@@ -176,20 +175,12 @@ function toggleDay(dayId: number) {
   }
 }
 
-function selectPresetRepeat(type: 'once' | 'daily' | 'weekdays' | 'specific') {
+function selectPresetRepeat(type: 'once' | 'daily') {
   if (type === 'once') {
     tipoRepeticion.value = 'una_vez'
   } else if (type === 'daily') {
     tipoRepeticion.value = 'dias_semana'
     diasSemana.value = [1, 2, 3, 4, 5, 6, 0]
-  } else if (type === 'weekdays') {
-    tipoRepeticion.value = 'dias_semana'
-    diasSemana.value = [1, 2, 3, 4, 5]
-  } else if (type === 'specific') {
-    tipoRepeticion.value = 'fecha_especifica'
-    if (!fechaEspecifica.value) {
-      fechaEspecifica.value = new Date().toISOString().split('T')[0]
-    }
   }
 }
 
@@ -487,62 +478,7 @@ function handleSubmit() {
               />
             </button>
 
-            <!-- Monday to Friday -->
-            <button
-              type="button"
-              @click="selectPresetRepeat('weekdays')"
-              class="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-slate-100 transition-colors"
-            >
-              <span
-                class="text-sm font-semibold"
-                :class="
-                  tipoRepeticion === 'dias_semana' &&
-                  diasSemana.length === 5 &&
-                  [1, 2, 3, 4, 5].every((d) => diasSemana.includes(d))
-                    ? 'text-emerald-700'
-                    : 'text-slate-800'
-                "
-              >
-                Lunes a viernes
-              </span>
-              <Check
-                v-if="
-                  tipoRepeticion === 'dias_semana' &&
-                  diasSemana.length === 5 &&
-                  [1, 2, 3, 4, 5].every((d) => diasSemana.includes(d))
-                "
-                class="w-4 h-4 text-emerald-600 stroke-[2.5]"
-              />
-            </button>
-
-            <!-- Specific Calendar Date -->
-            <div class="px-4 py-3 hover:bg-slate-100 transition-colors">
-              <button
-                type="button"
-                @click="selectPresetRepeat('specific')"
-                class="w-full flex items-center justify-between text-left"
-              >
-                <div class="flex items-center gap-2">
-                  <CalendarDays class="w-4 h-4 text-slate-500" />
-                  <span class="text-sm font-semibold" :class="tipoRepeticion === 'fecha_especifica' ? 'text-emerald-700' : 'text-slate-800'">
-                    Fecha específica
-                  </span>
-                </div>
-                <Check v-if="tipoRepeticion === 'fecha_especifica'" class="w-4 h-4 text-emerald-600 stroke-[2.5]" />
-              </button>
-
-              <div v-if="tipoRepeticion === 'fecha_especifica'" class="mt-2.5">
-                <input
-                  v-model="fechaEspecifica"
-                  type="date"
-                  class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                />
-              </div>
-            </div>
-          </div>
-
-          <!-- Customize Days Button -->
-          <div class="rounded-2xl bg-slate-50 border border-slate-200 shadow-sm overflow-hidden">
+            <!-- Personalizar -->
             <button
               type="button"
               @click="
@@ -554,10 +490,25 @@ function handleSubmit() {
               class="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-slate-100 transition-colors group"
             >
               <div>
-                <span class="text-sm font-semibold text-slate-800 block">Personalizar</span>
-                <span class="text-xs text-slate-500 block mt-0.5">Elegir días específicos de la semana</span>
+                <span
+                  class="text-sm font-semibold block"
+                  :class="tipoRepeticion === 'dias_semana' && diasSemana.length !== 7 ? 'text-emerald-700' : 'text-slate-800'"
+                >
+                  Personalizar
+                </span>
+                <span class="text-xs text-slate-500 block mt-0.5">
+                  Elegir días específicos de la semana
+                </span>
               </div>
-              <ChevronRight class="w-5 h-5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+              <div class="flex items-center gap-1.5">
+                <span
+                  v-if="tipoRepeticion === 'dias_semana' && diasSemana.length !== 7"
+                  class="text-xs font-semibold text-emerald-700"
+                >
+                  {{ repetitionSummary }}
+                </span>
+                <ChevronRight class="w-5 h-5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+              </div>
             </button>
           </div>
         </div>
