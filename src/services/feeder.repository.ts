@@ -191,6 +191,10 @@ export const FeederRepository = {
       const list = Object.entries(data).map(([key, item]) => ({
         ...item,
         id: item.id || key,
+        dias_semana: Array.isArray(item.dias_semana) ? item.dias_semana : [],
+        fecha_especifica: item.fecha_especifica ?? null,
+        ultima_ejecucion_fecha: item.ultima_ejecucion_fecha ?? null,
+        omitida_hoy_fecha: item.omitida_hoy_fecha ?? null,
       }))
       callback(list)
     })

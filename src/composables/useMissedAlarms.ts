@@ -46,7 +46,7 @@ export function useMissedAlarms() {
       // Check if applies today
       let appliesToday = false
       if (alarma.tipo_repeticion === 'dias_semana') {
-        appliesToday = alarma.dias_semana.includes(currentDay)
+        appliesToday = (alarma.dias_semana || []).includes(currentDay)
       } else if (alarma.tipo_repeticion === 'una_vez') {
         appliesToday = true
       } else if (alarma.tipo_repeticion === 'fecha_especifica') {

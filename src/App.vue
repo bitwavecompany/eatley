@@ -82,9 +82,6 @@ async function handleConfirmLogout() {
         <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">
           eat<span class="text-emerald-600">ley</span>
         </h1>
-        <span class="text-[10px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
-          IoT
-        </span>
       </div>
       <div class="flex items-center gap-2 text-xs font-medium text-slate-500">
         <Loader2 class="w-4 h-4 animate-spin text-emerald-600" />

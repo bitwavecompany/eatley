@@ -52,7 +52,9 @@ watch(
         etiqueta.value = props.initialAlarm.etiqueta
         activa.value = props.initialAlarm.activa
         tipoRepeticion.value = props.initialAlarm.tipo_repeticion
-        diasSemana.value = [...props.initialAlarm.dias_semana]
+        diasSemana.value = Array.isArray(props.initialAlarm.dias_semana) && props.initialAlarm.dias_semana.length > 0
+          ? [...props.initialAlarm.dias_semana]
+          : [1, 2, 3, 4, 5, 6, 0]
         fechaEspecifica.value = props.initialAlarm.fecha_especifica || ''
       } else {
         hora.value = '08:00'

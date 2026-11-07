@@ -51,7 +51,7 @@ export const useAlarmsStore = defineStore('alarms', () => {
       // Check if applies today
       let appliesToday = false
       if (a.tipo_repeticion === 'dias_semana') {
-        appliesToday = a.dias_semana.includes(currentDay)
+        appliesToday = (a.dias_semana || []).includes(currentDay)
       } else if (a.tipo_repeticion === 'una_vez') {
         appliesToday = true
       } else if (a.tipo_repeticion === 'fecha_especifica') {
@@ -76,7 +76,7 @@ export const useAlarmsStore = defineStore('alarms', () => {
       for (const a of alarmasActivas.value) {
         let appliesTomorrow = false
         if (a.tipo_repeticion === 'dias_semana') {
-          appliesTomorrow = a.dias_semana.includes(tomorrowDay)
+          appliesTomorrow = (a.dias_semana || []).includes(tomorrowDay)
         } else if (a.tipo_repeticion === 'una_vez') {
           appliesTomorrow = true
         }

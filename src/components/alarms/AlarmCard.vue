@@ -21,18 +21,19 @@ const repetitionLabel = computed<string>(() => {
   if (props.alarma.tipo_repeticion === 'fecha_especifica') {
     return props.alarma.fecha_especifica ? `Fecha: ${props.alarma.fecha_especifica}` : 'Fecha específica'
   }
-  if (props.alarma.dias_semana.length === 7) {
+  const dias = props.alarma.dias_semana || []
+  if (dias.length === 7) {
     return 'Todos los días'
   }
   if (
-    props.alarma.dias_semana.length === 5 &&
-    [1, 2, 3, 4, 5].every((d) => props.alarma.dias_semana.includes(d))
+    dias.length === 5 &&
+    [1, 2, 3, 4, 5].every((d) => dias.includes(d))
   ) {
     return 'Lunes a Viernes'
   }
   if (
-    props.alarma.dias_semana.length === 2 &&
-    [0, 6].every((d) => props.alarma.dias_semana.includes(d))
+    dias.length === 2 &&
+    [0, 6].every((d) => dias.includes(d))
   ) {
     return 'Fines de semana'
   }
@@ -41,7 +42,7 @@ const repetitionLabel = computed<string>(() => {
 })
 
 function isDayActive(dayId: number): boolean {
-  return props.alarma.tipo_repeticion === 'dias_semana' && props.alarma.dias_semana.includes(dayId)
+  return props.alarma.tipo_repeticion === 'dias_semana' && (props.alarma.dias_semana || []).includes(dayId)
 }
 </script>
 
