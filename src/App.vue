@@ -126,10 +126,9 @@ async function handleConfirmLogout() {
     <!-- Modal de Confirmación para Cerrar Sesión / Bloquear -->
     <ConfirmationModal
       :is-open="showLogoutModal"
-      title="¿Bloquear la aplicación?"
-      subtitle="Cierre de sesión familiar"
-      description="Se cerrará la sesión actual en este navegador. Para volver a controlar el dispensador y programar alarmas deberás ingresar nuevamente el PIN familiar."
-      confirm-text="Bloquear ahora"
+      title="¿Cerrar Sesión?"
+      description="Se cerrará la sesión actual"
+      confirm-text="Acepar"
       cancel-text="Cancelar"
       variant="warning"
       :icon="LogOut"

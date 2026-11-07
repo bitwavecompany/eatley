@@ -5,14 +5,11 @@ import {
   ChevronRight,
   Utensils,
   Bell,
-  PauseCircle,
-  PlayCircle,
   History,
   ArrowRight,
 } from '@lucide/vue'
 import { useAlarmsStore } from '@/stores/useAlarmsStore'
 import { useHistoryStore } from '@/stores/useHistoryStore'
-import { useConfigStore } from '@/stores/useConfigStore'
 import { APP_ROUTES } from '@/config/constants'
 import ManualFeedCard from '@/components/feeder/ManualFeedCard.vue'
 import MissedAlarmBanner from '@/components/feeder/MissedAlarmBanner.vue'
@@ -20,7 +17,6 @@ import HistoryList from '@/components/history/HistoryList.vue'
 
 const alarmsStore = useAlarmsStore()
 const historyStore = useHistoryStore()
-const configStore = useConfigStore()
 </script>
 
 <template>
@@ -92,25 +88,6 @@ const configStore = useConfigStore()
         </div>
       </div>
 
-      <!-- Stat 3: System Mode -->
-      <div class="p-4 rounded-2xl bg-white border border-slate-200 col-span-2 sm:col-span-1 flex items-center gap-3 shadow-sm">
-        <div
-          class="p-2.5 rounded-xl shrink-0"
-          :class="configStore.isSystemPaused ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'"
-        >
-          <PauseCircle v-if="configStore.isSystemPaused" class="w-5 h-5" />
-          <PlayCircle v-else class="w-5 h-5" />
-        </div>
-        <div>
-          <span class="text-[11px] font-medium text-slate-500 block">Modo Operativo</span>
-          <span
-            class="text-sm font-bold truncate block"
-            :class="configStore.isSystemPaused ? 'text-amber-700' : 'text-emerald-700'"
-          >
-            {{ configStore.isSystemPaused ? 'Pausa Vacaciones' : 'Automático Normal' }}
-          </span>
-        </div>
-      </div>
     </div>
 
     <!-- Main Manual Feed Hero Card -->
@@ -121,7 +98,7 @@ const configStore = useConfigStore()
       <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
         <div class="flex items-center gap-2.5">
           <History class="w-5 h-5 text-slate-500" />
-          <h3 class="font-bold text-slate-900 text-base">Últimas Aperturas</h3>
+          <h3 class="font-bold text-slate-900 text-base">Última vez que comio</h3>
         </div>
 
         <RouterLink

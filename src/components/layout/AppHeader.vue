@@ -2,8 +2,6 @@
 import {
   PawPrint,
   PauseCircle,
-  Cloud,
-  CloudOff,
   Cpu,
   Wifi,
   WifiLow,
@@ -38,11 +36,7 @@ const configStore = useConfigStore()
             <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900">
               eat<span class="text-emerald-600">ley</span>
             </h1>
-            <span class="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider px-1 sm:px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
-              IoT
-            </span>
           </div>
-          <p class="text-[10px] sm:text-[11px] text-slate-500 hidden sm:block">Dispensador Inteligente</p>
         </div>
       </div>
 
@@ -57,59 +51,6 @@ const configStore = useConfigStore()
           <PauseCircle class="w-3.5 h-3.5 text-amber-600 shrink-0" />
           <span class="hidden md:inline">Pausa Activa</span>
           <span class="md:hidden">Pausa</span>
-        </div>
-
-        <!-- 1. BADGE NUBE (Firebase Realtime Database WebSocket) -->
-        <div
-          class="flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] sm:text-xs font-semibold transition-all shadow-sm shrink-0"
-          :class="[
-            deviceStore.isFirebaseConnected
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-              : deviceStore.firebaseConnectionStatus === 'reconectando'
-                ? 'bg-amber-50 border-amber-300 text-amber-800'
-                : 'bg-rose-50 border-rose-200 text-rose-800'
-          ]"
-          :title="
-            deviceStore.isFirebaseConnected
-              ? 'Enlace WebSocket activo con Firebase Realtime Database'
-              : 'Sin comunicación WebSocket con los servidores de Firebase'
-          "
-        >
-          <!-- Cloud Icon -->
-          <Cloud v-if="deviceStore.isFirebaseConnected" class="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-          <CloudOff v-else class="w-3.5 h-3.5 text-rose-600 shrink-0" />
-
-          <!-- Indicator Dot -->
-          <span class="relative flex h-1.5 w-1.5 shrink-0">
-            <span
-              v-if="deviceStore.isFirebaseConnected"
-              class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"
-            ></span>
-            <span
-              class="relative inline-flex rounded-full h-1.5 w-1.5"
-              :class="
-                deviceStore.isFirebaseConnected
-                  ? 'bg-emerald-600'
-                  : deviceStore.firebaseConnectionStatus === 'reconectando'
-                    ? 'bg-amber-500 animate-pulse'
-                    : 'bg-rose-500'
-              "
-            ></span>
-          </span>
-
-          <!-- Label -->
-          <span class="hidden md:inline">
-            {{
-              deviceStore.isFirebaseConnected
-                ? 'Nube activa'
-                : deviceStore.firebaseConnectionStatus === 'reconectando'
-                  ? 'Reconectando Nube...'
-                  : 'Sin Nube'
-            }}
-          </span>
-          <span class="md:hidden">
-            {{ deviceStore.isFirebaseConnected ? 'Nube' : 'Sin Nube' }}
-          </span>
         </div>
 
         <!-- 2. BADGE DISPOSITIVO (ESP32 Hardware Heartbeat) -->
@@ -175,10 +116,10 @@ const configStore = useConfigStore()
           type="button"
           @click="emit('logout')"
           class="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-slate-200 bg-white hover:bg-rose-50 hover:border-rose-200 text-slate-500 hover:text-rose-600 text-[11px] sm:text-xs font-semibold transition-all shadow-sm shrink-0"
-          title="Cerrar sesión familiar y bloquear la aplicación"
+          title="Cerrar Sesión"
         >
           <LogOut class="w-3.5 h-3.5" />
-          <span class="hidden sm:inline">Bloquear</span>
+          <span class="hidden sm:inline">Cerrar Sesión</span>
         </button>
       </div>
     </div>

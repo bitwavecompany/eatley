@@ -48,9 +48,6 @@ function formatTimestamp(ts: number): { time: string; date: string } {
         <Inbox class="w-8 h-8" />
       </div>
       <p class="text-sm font-semibold text-slate-700">{{ emptyMessage }}</p>
-      <p class="text-xs text-slate-500 mt-1 max-w-sm">
-        Los eventos se registrarán automáticamente cuando el ESP32 accione el servomotor de forma programada o manual.
-      </p>
     </div>
 
     <!-- Event Rows -->

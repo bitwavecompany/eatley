@@ -64,7 +64,7 @@ router.beforeEach(async (to) => {
 
 // Actualización dinámica del título de la pestaña
 router.afterEach((to) => {
-  const baseTitle = 'eatley - Dispensador Inteligente'
+  const baseTitle = 'eatley'
   if (to.meta.title && typeof to.meta.title === 'string') {
     document.title = `${to.meta.title} | eatley`
   } else {
