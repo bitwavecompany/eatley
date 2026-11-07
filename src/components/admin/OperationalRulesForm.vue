@@ -2,9 +2,11 @@
 import { ref, watch } from 'vue'
 import { ShieldAlert, CheckCircle, Loader2, Save } from '@lucide/vue'
 import { useConfigStore } from '@/stores/useConfigStore'
+import { useToastStore } from '@/stores/useToastStore'
 import { OPERATIONAL_CONSTRAINTS } from '@/config/constants'
 
 const configStore = useConfigStore()
+const toastStore = useToastStore()
 
 const toleranciaApagon = ref(configStore.configuracion.tolerancia_apagon_min)
 const cooldownSeg = ref(configStore.configuracion.cooldown_manual_seg)
@@ -26,16 +28,21 @@ watch(
 
 async function handleSave() {
   saveSuccess.value = false
-  await configStore.actualizarConfiguracion({
-    tolerancia_apagon_min: Number(toleranciaApagon.value),
-    cooldown_manual_seg: Number(cooldownSeg.value),
-    sistema_pausado: Boolean(sistemaPausado.value),
-    usar_microswitch: Boolean(usarMicroswitch.value),
-  })
-  saveSuccess.value = true
-  setTimeout(() => {
-    saveSuccess.value = false
-  }, 3000)
+  try {
+    await configStore.actualizarConfiguracion({
+      tolerancia_apagon_min: Number(toleranciaApagon.value),
+      cooldown_manual_seg: Number(cooldownSeg.value),
+      sistema_pausado: Boolean(sistemaPausado.value),
+      usar_microswitch: Boolean(usarMicroswitch.value),
+    })
+    saveSuccess.value = true
+    toastStore.success('Reglas guardadas')
+    setTimeout(() => {
+      saveSuccess.value = false
+    }, 3000)
+  } catch {
+    toastStore.error('Error al guardar reglas')
+  }
 }
 </script>
 

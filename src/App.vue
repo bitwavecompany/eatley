@@ -12,6 +12,7 @@ import AppHeader from '@/components/layout/AppHeader.vue'
 import BottomNav from '@/components/layout/BottomNav.vue'
 import PinLockModal from '@/components/auth/PinLockModal.vue'
 import ConfirmationModal from '@/components/common/ConfirmationModal.vue'
+import AppSnackbar from '@/components/common/AppSnackbar.vue'
 import { APP_ROUTES } from '@/config/constants'
 import { PawPrint, Loader2, LogOut } from '@lucide/vue'
 
@@ -137,4 +138,7 @@ async function handleConfirmLogout() {
       @close="showLogoutModal = false"
     />
   </div>
+
+  <!-- Global Application Snackbar / Toast Container -->
+  <AppSnackbar />
 </template>

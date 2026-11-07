@@ -3,10 +3,12 @@ import { ref, watch } from 'vue'
 import { Gauge, Loader2, Play, CheckCircle, Save } from '@lucide/vue'
 import { useConfigStore } from '@/stores/useConfigStore'
 import { useDeviceStore } from '@/stores/useDeviceStore'
+import { useToastStore } from '@/stores/useToastStore'
 import { SERVO_CONSTRAINTS } from '@/config/constants'
 
 const configStore = useConfigStore()
 const deviceStore = useDeviceStore()
+const toastStore = useToastStore()
 
 // Local copy for editing
 const anguloCerrado = ref(configStore.configuracion.angulo_cerrado)
@@ -31,21 +33,31 @@ watch(
 
 async function handleSave() {
   saveSuccess.value = false
-  await configStore.actualizarConfiguracion({
-    angulo_cerrado: Number(anguloCerrado.value),
-    angulo_abierto: Number(anguloAbierto.value),
-    tiempo_abierto_ms: Number(tiempoAbiertoMs.value),
-    activar_sacudida: Boolean(activarSacudida.value),
-    desactivar_pulso_en_reposo: Boolean(desactivarPulso.value),
-  })
-  saveSuccess.value = true
-  setTimeout(() => {
-    saveSuccess.value = false
-  }, 3000)
+  try {
+    await configStore.actualizarConfiguracion({
+      angulo_cerrado: Number(anguloCerrado.value),
+      angulo_abierto: Number(anguloAbierto.value),
+      tiempo_abierto_ms: Number(tiempoAbiertoMs.value),
+      activar_sacudida: Boolean(activarSacudida.value),
+      desactivar_pulso_en_reposo: Boolean(desactivarPulso.value),
+    })
+    saveSuccess.value = true
+    toastStore.success('Calibración guardada')
+    setTimeout(() => {
+      saveSuccess.value = false
+    }, 3000)
+  } catch {
+    toastStore.error('Error al guardar calibración')
+  }
 }
 
 async function handleTestServo() {
-  await deviceStore.testServoDryRun()
+  try {
+    await deviceStore.testServoDryRun()
+    toastStore.info('Prueba de servo enviada')
+  } catch {
+    toastStore.error('Error al enviar prueba de servo')
+  }
 }
 </script>
 

@@ -4,13 +4,20 @@ import { Trash2 } from '@lucide/vue'
 import { useHistoryStore } from '@/stores/useHistoryStore'
 import HistoryList from '@/components/history/HistoryList.vue'
 import ConfirmationModal from '@/components/common/ConfirmationModal.vue'
+import { useToastStore } from '@/stores/useToastStore'
 
 const historyStore = useHistoryStore()
+const toastStore = useToastStore()
 const showConfirmClear = ref(false)
 
 async function handleClearHistory() {
   showConfirmClear.value = false
-  await historyStore.limpiarHistorial()
+  try {
+    await historyStore.limpiarHistorial()
+    toastStore.success('Historial eliminado')
+  } catch {
+    toastStore.error('Error al limpiar el historial')
+  }
 }
 </script>
 

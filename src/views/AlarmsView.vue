@@ -7,10 +7,12 @@ import AlarmCard from '@/components/alarms/AlarmCard.vue'
 import AlarmModal from '@/components/alarms/AlarmModal.vue'
 import MissedAlarmBanner from '@/components/feeder/MissedAlarmBanner.vue'
 import ConfirmationModal from '@/components/common/ConfirmationModal.vue'
+import { useToastStore } from '@/stores/useToastStore'
 import type { Alarma, CrearAlarmaPayload, ActualizarAlarmaPayload } from '@/types/alarm.types'
 
 const alarmsStore = useAlarmsStore()
 const configStore = useConfigStore()
+const toastStore = useToastStore()
 
 const isModalOpen = ref(false)
 const selectedAlarm = ref<Alarma | null>(null)
@@ -30,15 +32,36 @@ function openEditModal(alarma: Alarma) {
 }
 
 async function handleSaveCreate(payload: CrearAlarmaPayload) {
-  await alarmsStore.crearAlarma(payload)
+  try {
+    await alarmsStore.crearAlarma(payload)
+    toastStore.success('Alarma creada')
+  } catch {
+    toastStore.error('Error al crear alarma')
+  }
 }
 
 async function handleSaveUpdate(data: { id: string; payload: ActualizarAlarmaPayload }) {
-  await alarmsStore.actualizarAlarma(data.id, data.payload)
+  try {
+    await alarmsStore.actualizarAlarma(data.id, data.payload)
+    toastStore.success('Alarma actualizada')
+  } catch {
+    toastStore.error('Error al actualizar alarma')
+  }
 }
 
 async function handleToggle(id: string) {
-  await alarmsStore.toggleAlarma(id)
+  const item = alarmsStore.alarmas.find((a) => a.id === id)
+  const willBeActive = item ? !item.activa : true
+  try {
+    await alarmsStore.toggleAlarma(id)
+    if (willBeActive) {
+      toastStore.success('Alarma activada')
+    } else {
+      toastStore.info('Alarma desactivada')
+    }
+  } catch {
+    toastStore.error('Error al cambiar estado de la alarma')
+  }
 }
 
 function promptDelete(id: string) {
@@ -49,7 +72,12 @@ function promptDelete(id: string) {
 
 async function handleConfirmDelete() {
   if (alarmToDelete.value) {
-    await alarmsStore.eliminarAlarma(alarmToDelete.value.id)
+    try {
+      await alarmsStore.eliminarAlarma(alarmToDelete.value.id)
+      toastStore.success('Alarma eliminada')
+    } catch {
+      toastStore.error('Error al eliminar alarma')
+    }
   }
   showConfirmDelete.value = false
   alarmToDelete.value = null

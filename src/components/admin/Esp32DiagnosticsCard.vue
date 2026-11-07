@@ -2,14 +2,21 @@
 import { ref } from 'vue'
 import { Cpu, Info, Loader2, Power, AlertTriangle } from '@lucide/vue'
 import { useDeviceStore } from '@/stores/useDeviceStore'
+import { useToastStore } from '@/stores/useToastStore'
 import ConfirmationModal from '@/components/common/ConfirmationModal.vue'
 
 const deviceStore = useDeviceStore()
+const toastStore = useToastStore()
 const showConfirmReboot = ref(false)
 
 async function confirmReboot() {
   showConfirmReboot.value = false
-  await deviceStore.rebootEsp32()
+  try {
+    await deviceStore.rebootEsp32()
+    toastStore.warning('Comando de reinicio enviado')
+  } catch {
+    toastStore.error('Error al enviar comando de reinicio')
+  }
 }
 </script>
 

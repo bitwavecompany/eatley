@@ -4,6 +4,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth'
 import { FirebaseError } from 'firebase/app'
 import { auth } from '@/services/firebase.client'
 import { AUTH_CONFIG } from '@/config/constants'
+import { useToastStore } from '@/stores/useToastStore'
 import {
   PawPrint,
   Lock,
@@ -13,6 +14,7 @@ import {
   Loader2,
 } from '@lucide/vue'
 
+const toastStore = useToastStore()
 const pin = ref('')
 const cargando = ref(false)
 const errorMsg = ref('')
@@ -48,6 +50,7 @@ async function handlePinSubmit() {
 
   try {
     await signInWithEmailAndPassword(auth, AUTH_CONFIG.FAMILY_EMAIL, trimmedPin)
+    toastStore.success('Sesión iniciada con éxito')
     // El cambio de sesión es detectado en tiempo real por onAuthStateChanged en App.vue
   } catch (err: unknown) {
     pin.value = ''
