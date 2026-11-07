@@ -3,8 +3,6 @@ import { RouterLink } from 'vue-router'
 import {
   AlarmClockCheck,
   ChevronRight,
-  Utensils,
-  Bell,
   History,
   ArrowRight,
 } from '@lucide/vue'
@@ -62,32 +60,6 @@ const historyStore = useHistoryStore()
         <span>Gestionar Horarios</span>
         <ChevronRight class="w-4 h-4" />
       </RouterLink>
-    </div>
-
-    <!-- Quick Stats Grid -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-      <!-- Stat 1: Meals today -->
-      <div class="p-4 rounded-2xl bg-white border border-slate-200 flex items-center gap-3 shadow-sm">
-        <div class="p-2.5 rounded-xl bg-emerald-50 text-emerald-600 shrink-0">
-          <Utensils class="w-5 h-5" />
-        </div>
-        <div>
-          <span class="text-[11px] font-medium text-slate-500 block">Raciones Hoy</span>
-          <span class="text-xl font-bold font-mono text-slate-900">{{ historyStore.eventosHoy.length }}</span>
-        </div>
-      </div>
-
-      <!-- Stat 2: Active Alarms -->
-      <div class="p-4 rounded-2xl bg-white border border-slate-200 flex items-center gap-3 shadow-sm">
-        <div class="p-2.5 rounded-xl bg-blue-50 text-blue-600 shrink-0">
-          <Bell class="w-5 h-5" />
-        </div>
-        <div>
-          <span class="text-[11px] font-medium text-slate-500 block">Alarmas Activas</span>
-          <span class="text-xl font-bold font-mono text-slate-900">{{ alarmsStore.alarmasActivas.length }}</span>
-        </div>
-      </div>
-
     </div>
 
     <!-- Main Manual Feed Hero Card -->
