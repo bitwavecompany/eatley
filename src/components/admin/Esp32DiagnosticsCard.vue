@@ -117,12 +117,12 @@ async function confirmReboot() {
         </span>
       </div>
 
-      <!-- Metric 3: Último latido (Sincronización) -->
+      <!-- Metric 3: Última respuesta (Sincronización) -->
       <div class="relative p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
         <div class="flex items-center justify-between mb-1">
-          <span class="text-xs font-medium text-slate-500">Último latido</span>
+          <span class="text-xs font-medium text-slate-500">Última respuesta</span>
           <HelpTooltip
-            title="Último latido (Sincronización)"
+            title="Última respuesta (Sincronización)"
             text="Tiempo desde la última vez que el ESP32 reportó su estado a Firebase. Si supera el tiempo límite configurado sin responder, el sistema se marcará como desconectado."
             position="bottom"
             align="right"
@@ -133,9 +133,7 @@ async function confirmReboot() {
             {{ deviceStore.estadoEsp32 ? `${deviceStore.secondsSinceHeartbeat}s` : '--' }}
           </span>
         </div>
-        <span class="text-[11px] text-slate-500">
-          {{ deviceStore.estadoEsp32 ? `hace ${deviceStore.secondsSinceHeartbeat} segundos` : 'sin sincronizar' }}
-        </span>
+        <div class="h-4"></div>
       </div>
     </div>
 
