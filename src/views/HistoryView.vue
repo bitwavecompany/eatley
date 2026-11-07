@@ -1,31 +1,12 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { Trash2 } from '@lucide/vue'
 import { useHistoryStore } from '@/stores/useHistoryStore'
 import HistoryList from '@/components/history/HistoryList.vue'
 import ConfirmationModal from '@/components/common/ConfirmationModal.vue'
-import type { OrigenEvento } from '@/types/history.types'
 
 const historyStore = useHistoryStore()
-
-type FiltroOrigen = 'todos' | OrigenEvento
-const filtroActual = ref<FiltroOrigen>('todos')
 const showConfirmClear = ref(false)
-
-const eventosFiltrados = computed(() => {
-  if (filtroActual.value === 'todos') {
-    return historyStore.historial
-  }
-  return historyStore.historial.filter((e) => e.origen === filtroActual.value)
-})
-
-const conteoManual = computed(() => {
-  return historyStore.historial.filter((e) => e.origen === 'manual').length
-})
-
-const conteoAlarma = computed(() => {
-  return historyStore.historial.filter((e) => e.origen === 'alarma').length
-})
 
 async function handleClearHistory() {
   showConfirmClear.value = false
@@ -39,14 +20,8 @@ async function handleClearHistory() {
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
         <div class="flex items-center gap-2.5">
-          <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Bitácora de Aperturas</h2>
-          <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
-            {{ historyStore.totalEventos }} eventos
-          </span>
+          <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Historial de Alimentación</h2>
         </div>
-        <p class="text-xs sm:text-sm text-slate-500 mt-1">
-          Registro cronológico auditado de cada activación del servomotor por parte del ESP32.
-        </p>
       </div>
 
       <button
@@ -60,84 +35,8 @@ async function handleClearHistory() {
       </button>
     </div>
 
-    <!-- Quick Stat Chips -->
-    <div class="grid grid-cols-3 gap-3">
-      <div class="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-sm">
-        <span class="text-[11px] font-medium text-slate-500 block">Total Eventos</span>
-        <span class="text-lg font-bold font-mono text-slate-900 mt-0.5 block">{{ historyStore.totalEventos }}</span>
-      </div>
-
-      <div class="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-sm">
-        <span class="text-[11px] font-medium text-slate-500 block">Disparos Manuales</span>
-        <span class="text-lg font-bold font-mono text-emerald-700 mt-0.5 block">{{ conteoManual }}</span>
-      </div>
-
-      <div class="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-sm">
-        <span class="text-[11px] font-medium text-slate-500 block">Por Alarma</span>
-        <span class="text-lg font-bold font-mono text-blue-700 mt-0.5 block">{{ conteoAlarma }}</span>
-      </div>
-    </div>
-
-    <!-- Filter Buttons Bar -->
-    <div class="flex items-center gap-2 overflow-x-auto pb-1">
-      <button
-        type="button"
-        @click="filtroActual = 'todos'"
-        class="px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors shrink-0 shadow-sm"
-        :class="[
-          filtroActual === 'todos'
-            ? 'bg-emerald-600 text-white font-bold'
-            : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
-        ]"
-      >
-        Todos ({{ historyStore.totalEventos }})
-      </button>
-
-      <button
-        type="button"
-        @click="filtroActual = 'manual'"
-        class="px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors shrink-0 shadow-sm"
-        :class="[
-          filtroActual === 'manual'
-            ? 'bg-emerald-600 text-white font-bold'
-            : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
-        ]"
-      >
-        Manuales ({{ conteoManual }})
-      </button>
-
-      <button
-        type="button"
-        @click="filtroActual = 'alarma'"
-        class="px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors shrink-0 shadow-sm"
-        :class="[
-          filtroActual === 'alarma'
-            ? 'bg-emerald-600 text-white font-bold'
-            : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
-        ]"
-      >
-        Por Horario ({{ conteoAlarma }})
-      </button>
-
-      <button
-        type="button"
-        @click="filtroActual = 'prueba_admin'"
-        class="px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors shrink-0 shadow-sm"
-        :class="[
-          filtroActual === 'prueba_admin'
-            ? 'bg-emerald-600 text-white font-bold'
-            : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
-        ]"
-      >
-        Pruebas Técnicas
-      </button>
-    </div>
-
     <!-- Event List -->
-    <HistoryList
-      :eventos="eventosFiltrados"
-      empty-message="No se encontraron eventos con el filtro seleccionado."
-    />
+    <HistoryList :eventos="historyStore.historial" />
 
     <!-- Reusable Clear Confirmation Modal -->
     <ConfirmationModal

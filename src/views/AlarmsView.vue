@@ -65,14 +65,8 @@ async function handleConfirmDelete() {
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
         <div class="flex items-center gap-2.5">
-          <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Horarios de Alimentación</h2>
-          <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
-            {{ alarmsStore.alarmasActivas.length }} / {{ alarmsStore.alarmas.length }} activas
-          </span>
+          <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Programar Alimentación</h2>
         </div>
-        <p class="text-xs sm:text-sm text-slate-500 mt-1">
-          Configura las horas exactas en las que el ESP32 abrirá el servomotor automáticamente.
-        </p>
       </div>
 
       <button
