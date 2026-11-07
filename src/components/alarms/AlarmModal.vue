@@ -9,7 +9,7 @@ import {
   CalendarDays,
   AlertCircle,
 } from '@lucide/vue'
-import { DAYS_OF_WEEK, DEFAULT_ALARM_LABELS } from '@/config/constants'
+import { DAYS_OF_WEEK } from '@/config/constants'
 import { useDeviceStore } from '@/stores/useDeviceStore'
 import type {
   Alarma,
@@ -129,7 +129,6 @@ function handleMinuteTouchMove(e: TouchEvent) {
   }
 }
 
-// Android-style dynamic countdown subtitle
 const countdownSubtitle = computed(() => {
   const [targetH, targetM] = hora.value.split(':').map(Number)
   const now = new Date()
@@ -192,10 +191,6 @@ function selectPresetRepeat(type: 'once' | 'daily' | 'weekdays' | 'specific') {
       fechaEspecifica.value = new Date().toISOString().split('T')[0]
     }
   }
-}
-
-function selectLabelPreset(label: string) {
-  etiqueta.value = label
 }
 
 function handleDeleteFromModal() {
@@ -264,49 +259,44 @@ function handleSubmit() {
 <template>
   <div
     v-if="isOpen"
-    class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/50 backdrop-blur-sm transition-all"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-sm overflow-y-auto"
     @click.self="emit('close')"
   >
     <div
-      class="relative w-full sm:max-w-md rounded-t-[32px] sm:rounded-3xl bg-slate-50 sm:bg-white border-t sm:border border-slate-200/90 shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[85vh] overflow-hidden animate-in slide-in-from-bottom-6 sm:zoom-in-95 duration-200"
+      class="relative w-full max-w-sm sm:max-w-md my-auto rounded-3xl bg-white border border-slate-200 shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150"
     >
-      <!-- Mobile Notch Handle -->
-      <div class="sm:hidden pt-3 pb-1 flex justify-center">
-        <div class="w-10 h-1 rounded-full bg-slate-300"></div>
-      </div>
-
-      <!-- Error Toast Bar (if any) -->
+      <!-- Error Alert Bar (if any) -->
       <div
         v-if="errorMessage"
-        class="mx-4 mt-2 p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2"
+        class="mx-5 mt-4 p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2"
       >
         <AlertCircle class="w-4 h-4 text-rose-600 shrink-0" />
         <span>{{ errorMessage }}</span>
       </div>
 
       <!-- ======================================================== -->
-      <!-- VIEW 1: MAIN ALARM EDITOR (Screenshots 3 & 4)            -->
+      <!-- VIEW 1: MAIN ALARM EDITOR                                -->
       <!-- ======================================================== -->
-      <div v-if="currentStep === 'main'" class="flex flex-col flex-1 overflow-y-auto px-5 sm:px-6 pt-2 pb-6">
+      <div v-if="currentStep === 'main'" class="flex flex-col p-5 sm:p-6 space-y-5">
         <!-- Top App Bar -->
-        <div class="flex items-center justify-between py-2">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
           <!-- Cancel / Close Button -->
           <button
             type="button"
             @click="emit('close')"
-            class="p-2 rounded-full text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition-colors"
+            class="p-2 rounded-full text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
             title="Cancelar"
             aria-label="Cancelar"
           >
             <X class="w-5 h-5" />
           </button>
 
-          <!-- Centered Title -->
-          <div class="text-center">
-            <h3 class="text-base sm:text-lg font-bold text-slate-900">
+          <!-- Centered Title & Dynamic Subtitle -->
+          <div class="text-center px-2">
+            <h3 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">
               {{ isEditing ? 'Editar alarma' : 'Nueva alarma' }}
             </h3>
-            <p class="text-[11px] font-medium text-slate-500 mt-0.5">
+            <p class="text-[11px] font-semibold text-emerald-700 mt-0.5">
               {{ countdownSubtitle }}
             </p>
           </div>
@@ -324,8 +314,8 @@ function handleSubmit() {
         </div>
 
         <!-- Android Time Roller Wheel Picker (H & M) -->
-        <div class="py-6 sm:py-8 flex flex-col items-center justify-center select-none">
-          <div class="grid grid-cols-2 gap-8 sm:gap-10 w-full max-w-[280px]">
+        <div class="py-2 flex flex-col items-center justify-center select-none">
+          <div class="grid grid-cols-2 gap-8 w-full max-w-[260px]">
             <!-- Column 1: Hours (H) -->
             <div
               class="flex flex-col items-center justify-center cursor-ns-resize"
@@ -333,19 +323,19 @@ function handleSubmit() {
               @touchstart.passive="handleTouchStart"
               @touchmove.passive="handleHourTouchMove"
             >
-              <span class="text-[11px] font-bold text-slate-600 uppercase tracking-widest mb-2">H</span>
+              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">H</span>
 
               <!-- Previous Hour (-1) -->
               <button
                 type="button"
                 @click="changeHour(-1)"
-                class="h-8 text-2xl font-light text-slate-400 hover:text-slate-600 transition-colors font-mono"
+                class="h-7 text-xl font-light text-slate-300 hover:text-slate-600 transition-colors font-mono"
               >
                 {{ String((selectedHour - 1 + 24) % 24).padStart(2, '0') }}
               </button>
 
               <!-- Current Selected Hour (Center) -->
-              <div class="my-2 px-3 py-1 rounded-2xl bg-slate-100 sm:bg-slate-50 border border-slate-200 text-5xl font-extrabold text-slate-900 font-mono tracking-tight shadow-inner">
+              <div class="my-1 px-4 py-1.5 rounded-2xl bg-slate-50 border border-slate-200 text-4xl sm:text-5xl font-extrabold text-slate-900 font-mono tracking-tight shadow-inner">
                 {{ String(selectedHour).padStart(2, '0') }}
               </div>
 
@@ -353,7 +343,7 @@ function handleSubmit() {
               <button
                 type="button"
                 @click="changeHour(1)"
-                class="h-8 text-2xl font-light text-slate-400 hover:text-slate-600 transition-colors font-mono"
+                class="h-7 text-xl font-light text-slate-300 hover:text-slate-600 transition-colors font-mono"
               >
                 {{ String((selectedHour + 1) % 24).padStart(2, '0') }}
               </button>
@@ -366,19 +356,19 @@ function handleSubmit() {
               @touchstart.passive="handleTouchStart"
               @touchmove.passive="handleMinuteTouchMove"
             >
-              <span class="text-[11px] font-bold text-slate-600 uppercase tracking-widest mb-2">M</span>
+              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">M</span>
 
               <!-- Previous Minute (-1) -->
               <button
                 type="button"
                 @click="changeMinute(-1)"
-                class="h-8 text-2xl font-light text-slate-400 hover:text-slate-600 transition-colors font-mono"
+                class="h-7 text-xl font-light text-slate-300 hover:text-slate-600 transition-colors font-mono"
               >
                 {{ String((selectedMinute - 1 + 60) % 60).padStart(2, '0') }}
               </button>
 
               <!-- Current Selected Minute (Center) -->
-              <div class="my-2 px-3 py-1 rounded-2xl bg-slate-100 sm:bg-slate-50 border border-slate-200 text-5xl font-extrabold text-slate-900 font-mono tracking-tight shadow-inner">
+              <div class="my-1 px-4 py-1.5 rounded-2xl bg-slate-50 border border-slate-200 text-4xl sm:text-5xl font-extrabold text-slate-900 font-mono tracking-tight shadow-inner">
                 {{ String(selectedMinute).padStart(2, '0') }}
               </div>
 
@@ -386,7 +376,7 @@ function handleSubmit() {
               <button
                 type="button"
                 @click="changeMinute(1)"
-                class="h-8 text-2xl font-light text-slate-400 hover:text-slate-600 transition-colors font-mono"
+                class="h-7 text-xl font-light text-slate-300 hover:text-slate-600 transition-colors font-mono"
               >
                 {{ String((selectedMinute + 1) % 60).padStart(2, '0') }}
               </button>
@@ -394,59 +384,46 @@ function handleSubmit() {
           </div>
         </div>
 
-        <!-- Android Grouped Settings Card (Screenshot 3) -->
-        <div class="space-y-3">
-          <div class="rounded-2xl bg-white sm:bg-slate-50 border border-slate-200 divide-y divide-slate-100 sm:divide-slate-200/80 shadow-sm overflow-hidden">
-            <!-- Row 1: Repeat Configuration Button -->
+        <!-- Form Fields -->
+        <div class="space-y-3 pt-1">
+          <!-- Repeat Selector Card -->
+          <div class="rounded-2xl bg-slate-50 border border-slate-200/90 shadow-sm overflow-hidden">
             <button
               type="button"
               @click="currentStep = 'repeat'"
-              class="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-100/70 transition-colors group"
+              class="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-slate-100 transition-colors group"
             >
-              <span class="text-sm font-semibold text-slate-800">Repetir</span>
-              <div class="flex items-center gap-1.5 text-xs font-medium text-slate-600 group-hover:text-slate-900 transition-colors">
-                <span>{{ repetitionSummary }}</span>
-                <ChevronRight class="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+              <div>
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Repetición</span>
+                <span class="text-sm font-bold text-slate-900 mt-0.5 block">{{ repetitionSummary }}</span>
+              </div>
+              <div class="flex items-center gap-1 text-emerald-700 font-semibold text-xs group-hover:translate-x-0.5 transition-transform">
+                <span>Cambiar</span>
+                <ChevronRight class="w-4 h-4 text-emerald-600" />
               </div>
             </button>
-
-            <!-- Row 2: Label Input -->
-            <div class="px-4 py-3 flex items-center justify-between gap-3">
-              <span class="text-sm font-semibold text-slate-800 shrink-0">Etiqueta</span>
-              <input
-                v-model="etiqueta"
-                type="text"
-                maxlength="30"
-                placeholder="Ración programada"
-                class="w-full text-right text-sm text-slate-800 placeholder-slate-400 bg-transparent focus:outline-none font-medium truncate"
-              />
-            </div>
           </div>
 
-          <!-- Quick Label Presets -->
-          <div class="flex items-center gap-1.5 overflow-x-auto py-1">
-            <button
-              v-for="preset in DEFAULT_ALARM_LABELS"
-              :key="preset"
-              type="button"
-              @click="selectLabelPreset(preset)"
-              class="px-2.5 py-1 rounded-full text-xs font-semibold shrink-0 transition-colors"
-              :class="[
-                etiqueta === preset
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'bg-white sm:bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
-              ]"
-            >
-              {{ preset }}
-            </button>
+          <!-- Dedicated Alarm Name Input Box -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+              Nombre de la alarma
+            </label>
+            <input
+              v-model="etiqueta"
+              type="text"
+              maxlength="35"
+              placeholder="Ej: Desayuno, Almuerzo, Cena..."
+              class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-sm font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all shadow-inner"
+            />
           </div>
 
-          <!-- Delete Action (if editing existing alarm) -->
+          <!-- Delete Action (if editing) -->
           <button
             v-if="isEditing"
             type="button"
             @click="handleDeleteFromModal"
-            class="w-full mt-3 py-3 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 border border-rose-200/80 transition-colors shadow-sm"
+            class="w-full mt-2 py-3 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 border border-rose-200/80 transition-colors shadow-sm"
           >
             <Trash2 class="w-4 h-4" />
             <span>Eliminar esta alarma</span>
@@ -455,15 +432,15 @@ function handleSubmit() {
       </div>
 
       <!-- ======================================================== -->
-      <!-- VIEW 2: REPEAT SUB-MENU (Screenshot 2)                   -->
+      <!-- VIEW 2: REPEAT SUB-MENU                                  -->
       <!-- ======================================================== -->
-      <div v-else-if="currentStep === 'repeat'" class="flex flex-col flex-1 overflow-y-auto px-5 sm:px-6 pt-2 pb-6 animate-in slide-in-from-right-4 duration-150">
-        <!-- Top App Bar with Back Arrow -->
-        <div class="flex items-center justify-between py-2 border-b border-slate-200/80 mb-4">
+      <div v-else-if="currentStep === 'repeat'" class="flex flex-col p-5 sm:p-6 space-y-4 animate-in slide-in-from-right-4 duration-150">
+        <!-- Top Bar with Back Arrow -->
+        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
           <button
             type="button"
             @click="currentStep = 'main'"
-            class="p-2 rounded-full text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition-colors"
+            class="p-2 rounded-full text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
             title="Volver"
             aria-label="Volver"
           >
@@ -477,14 +454,14 @@ function handleSubmit() {
           <div class="w-9"></div>
         </div>
 
-        <div class="space-y-4">
-          <!-- Card Group 1: Standard Options -->
-          <div class="rounded-2xl bg-white sm:bg-slate-50 border border-slate-200 divide-y divide-slate-100 sm:divide-slate-200/80 shadow-sm overflow-hidden">
-            <!-- Option: Once -->
+        <div class="space-y-3">
+          <!-- Preset Options Group -->
+          <div class="rounded-2xl bg-slate-50 border border-slate-200 divide-y divide-slate-200/80 shadow-sm overflow-hidden">
+            <!-- Once -->
             <button
               type="button"
               @click="selectPresetRepeat('once')"
-              class="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-100/70 transition-colors"
+              class="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-slate-100 transition-colors"
             >
               <span class="text-sm font-semibold" :class="tipoRepeticion === 'una_vez' ? 'text-emerald-700' : 'text-slate-800'">
                 Una sola vez
@@ -492,17 +469,17 @@ function handleSubmit() {
               <Check v-if="tipoRepeticion === 'una_vez'" class="w-4 h-4 text-emerald-600 stroke-[2.5]" />
             </button>
 
-            <!-- Option: Daily (Every day) -->
+            <!-- Daily -->
             <button
               type="button"
               @click="selectPresetRepeat('daily')"
-              class="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-100/70 transition-colors"
+              class="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-slate-100 transition-colors"
             >
               <span
                 class="text-sm font-semibold"
                 :class="tipoRepeticion === 'dias_semana' && diasSemana.length === 7 ? 'text-emerald-700' : 'text-slate-800'"
               >
-                Diario
+                Diario (Todos los días)
               </span>
               <Check
                 v-if="tipoRepeticion === 'dias_semana' && diasSemana.length === 7"
@@ -510,11 +487,11 @@ function handleSubmit() {
               />
             </button>
 
-            <!-- Option: Monday to Friday -->
+            <!-- Monday to Friday -->
             <button
               type="button"
               @click="selectPresetRepeat('weekdays')"
-              class="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-100/70 transition-colors"
+              class="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-slate-100 transition-colors"
             >
               <span
                 class="text-sm font-semibold"
@@ -538,8 +515,8 @@ function handleSubmit() {
               />
             </button>
 
-            <!-- Option: Specific calendar date -->
-            <div class="px-4 py-3.5 hover:bg-slate-100/70 transition-colors">
+            <!-- Specific Calendar Date -->
+            <div class="px-4 py-3 hover:bg-slate-100 transition-colors">
               <button
                 type="button"
                 @click="selectPresetRepeat('specific')"
@@ -558,14 +535,14 @@ function handleSubmit() {
                 <input
                   v-model="fechaEspecifica"
                   type="date"
-                  class="w-full px-3 py-2 rounded-xl bg-slate-50 sm:bg-white border border-slate-200 text-xs sm:text-sm font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
             </div>
           </div>
 
-          <!-- Card Group 2: Customize Button -->
-          <div class="rounded-2xl bg-white sm:bg-slate-50 border border-slate-200 shadow-sm overflow-hidden">
+          <!-- Customize Days Button -->
+          <div class="rounded-2xl bg-slate-50 border border-slate-200 shadow-sm overflow-hidden">
             <button
               type="button"
               @click="
@@ -574,7 +551,7 @@ function handleSubmit() {
                   currentStep = 'customize'
                 }
               "
-              class="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-100/70 transition-colors group"
+              class="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-slate-100 transition-colors group"
             >
               <div>
                 <span class="text-sm font-semibold text-slate-800 block">Personalizar</span>
@@ -587,15 +564,15 @@ function handleSubmit() {
       </div>
 
       <!-- ======================================================== -->
-      <!-- VIEW 3: CUSTOMIZE DAYS SUB-MENU (Screenshot 1)           -->
+      <!-- VIEW 3: CUSTOMIZE DAYS SUB-MENU                          -->
       <!-- ======================================================== -->
-      <div v-else-if="currentStep === 'customize'" class="flex flex-col flex-1 overflow-y-auto px-5 sm:px-6 pt-2 pb-6 animate-in slide-in-from-right-4 duration-150">
-        <!-- Top App Bar with Back Arrow -->
-        <div class="flex items-center justify-between py-2 border-b border-slate-200/80 mb-4">
+      <div v-else-if="currentStep === 'customize'" class="flex flex-col p-5 sm:p-6 space-y-4 animate-in slide-in-from-right-4 duration-150">
+        <!-- Top Bar with Back Arrow -->
+        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
           <button
             type="button"
             @click="currentStep = 'repeat'"
-            class="p-2 rounded-full text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition-colors"
+            class="p-2 rounded-full text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
             title="Volver"
             aria-label="Volver"
           >
@@ -609,20 +586,19 @@ function handleSubmit() {
           <div class="w-9"></div>
         </div>
 
-        <!-- Android Days List with Circular Checkboxes (Screenshot 1) -->
-        <div class="rounded-2xl bg-white sm:bg-slate-50 border border-slate-200 divide-y divide-slate-100 sm:divide-slate-200/80 shadow-sm overflow-hidden">
+        <!-- Days of Week with Circular Checkboxes -->
+        <div class="rounded-2xl bg-slate-50 border border-slate-200 divide-y divide-slate-200/80 shadow-sm overflow-hidden max-h-[60vh] overflow-y-auto">
           <button
             v-for="day in DAYS_OF_WEEK"
             :key="day.id"
             type="button"
             @click="toggleDay(day.id)"
-            class="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-slate-100/70 transition-colors"
+            class="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-slate-100 transition-colors"
           >
             <span class="text-sm font-semibold text-slate-800">
               {{ day.fullLabel }}
             </span>
 
-            <!-- Android Circular Checkbox -->
             <div
               class="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-150"
               :class="[
