@@ -8,9 +8,18 @@ import {
   Wifi,
   WifiLow,
   WifiZero,
+  LogOut,
 } from '@lucide/vue'
 import { useDeviceStore } from '@/stores/useDeviceStore'
 import { useConfigStore } from '@/stores/useConfigStore'
+
+defineProps<{
+  isAuthenticated?: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'logout'): void
+}>()
 
 const deviceStore = useDeviceStore()
 const configStore = useConfigStore()
@@ -37,7 +46,7 @@ const configStore = useConfigStore()
         </div>
       </div>
 
-      <!-- State Badges Group -->
+      <!-- State Badges Group & Sign Out -->
       <div class="flex items-center gap-1.5 sm:gap-2.5 overflow-x-auto justify-end py-1">
         <!-- Global Pause Pill (if active) -->
         <div
@@ -159,6 +168,18 @@ const configStore = useConfigStore()
             />
           </div>
         </div>
+
+        <!-- 3. BOTÓN DISCRETO CERRAR SESIÓN -->
+        <button
+          v-if="isAuthenticated"
+          type="button"
+          @click="emit('logout')"
+          class="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-slate-200 bg-white hover:bg-rose-50 hover:border-rose-200 text-slate-500 hover:text-rose-600 text-[11px] sm:text-xs font-semibold transition-all shadow-sm shrink-0"
+          title="Cerrar sesión familiar y bloquear la aplicación"
+        >
+          <LogOut class="w-3.5 h-3.5" />
+          <span class="hidden sm:inline">Bloquear</span>
+        </button>
       </div>
     </div>
   </header>

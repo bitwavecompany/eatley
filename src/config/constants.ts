@@ -80,6 +80,13 @@ export const DAYS_OF_WEEK: readonly DayOfWeekItem[] = [
 ] as const
 
 /**
+ * Family Authentication Configuration
+ */
+export const AUTH_CONFIG = {
+  FAMILY_EMAIL: 'familia@eatley.local',
+} as const
+
+/**
  * Common quick alarm presets or labels
  */
 export const DEFAULT_ALARM_LABELS = [
