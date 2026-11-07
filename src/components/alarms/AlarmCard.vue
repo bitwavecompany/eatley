@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Trash2 } from '@lucide/vue'
 import type { Alarma } from '@/types/alarm.types'
 
 const props = defineProps<{
@@ -84,20 +83,8 @@ const repetitionLabel = computed<string>(() => {
       </div>
     </div>
 
-    <!-- Right: Quick Actions & Switch Toggle -->
-    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-      <!-- Discreet Trash Button for quick desktop deletion -->
-      <button
-        type="button"
-        @click.stop="emit('delete', alarma.id)"
-        class="opacity-0 group-hover:opacity-100 focus:opacity-100 p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all"
-        title="Eliminar alarma"
-        aria-label="Eliminar alarma"
-      >
-        <Trash2 class="w-4 h-4" />
-      </button>
-
-      <!-- Android-Style Pill Switch Toggle -->
+    <!-- Right: Android-Style Pill Switch Toggle -->
+    <div class="flex items-center shrink-0">
       <button
         type="button"
         role="switch"
