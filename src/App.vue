@@ -12,6 +12,7 @@ import AppHeader from '@/components/layout/AppHeader.vue'
 import BottomNav from '@/components/layout/BottomNav.vue'
 import PinLockModal from '@/components/auth/PinLockModal.vue'
 import ConfirmationModal from '@/components/common/ConfirmationModal.vue'
+import { APP_ROUTES } from '@/config/constants'
 import { PawPrint, Loader2, LogOut } from '@lucide/vue'
 
 const deviceStore = useDeviceStore()
@@ -54,8 +55,8 @@ async function handleConfirmLogout() {
   if (auth) {
     try {
       await signOut(auth)
-      // Recargar la ventana para reiniciar completamente el estado reactivo y sockets
-      window.location.reload()
+      // Redirigir al home y recargar la ventana para reiniciar completamente el estado reactivo y sockets
+      window.location.href = APP_ROUTES.DASHBOARD
     } catch (err) {
       console.error('Error al cerrar sesión:', err)
     }

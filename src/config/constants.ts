@@ -83,7 +83,7 @@ export const DAYS_OF_WEEK: readonly DayOfWeekItem[] = [
  * Family Authentication Configuration
  */
 export const AUTH_CONFIG = {
-  FAMILY_EMAIL: 'familia@eatley.local',
+  FAMILY_EMAIL: 'familiadiaz@gmail.com',
 } as const
 
 /**

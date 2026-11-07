@@ -1,6 +1,6 @@
 import { initializeApp, type FirebaseApp, getApps } from 'firebase/app'
 import { getDatabase, type Database } from 'firebase/database'
-import { getAuth, type Auth } from 'firebase/auth'
+import { getAuth, type Auth, type User } from 'firebase/auth'
 import { env } from '@/config/env'
 
 let firebaseAppInstance: FirebaseApp | null = null
@@ -73,6 +73,20 @@ export function getFirebaseAuth(): Auth | null {
   }
 
   return firebaseAuthInstance
+}
+
+/**
+ * Resolves the currently authenticated user once the initial auth state is ready.
+ * Returns null if Firebase is not configured or no user is signed in.
+ */
+export async function getCurrentUser(): Promise<User | null> {
+  const authInstance = getFirebaseAuth()
+  if (!authInstance) {
+    return null
+  }
+
+  await authInstance.authStateReady()
+  return authInstance.currentUser
 }
 
 // Instancia de Auth exportada directamente para su uso en la aplicación
