@@ -6,7 +6,6 @@ import {
   Utensils,
   RotateCw,
   Clock,
-  Sparkles,
   CheckCircle2,
   CloudOff,
 } from '@lucide/vue'
@@ -121,21 +120,9 @@ async function handleFeedClick() {
             ? 'Sin Conexión con la Nube'
             : deviceStore.isDispensing
               ? 'Dispensando Alimento...'
-              : 'Disparo Manual'
+              : 'Alimentar Manualmente'
         }}
       </h2>
-
-      <p class="mt-2 text-sm text-slate-600 max-w-sm">
-        {{
-          !deviceStore.isFirebaseConnected
-            ? 'Reconectando con Firebase Realtime Database. El botón se habilitará automáticamente al restablecer el enlace.'
-            : deviceStore.isDispensing
-              ? 'El servomotor MG996R está ejecutando el ciclo de apertura configurado.'
-              : isCoolingDown
-                ? `Bloqueo anti-doble clic activo. Podrás dispensar nuevamente en ${remainingSeconds}s.`
-                : 'Presiona el botón para servir una ración instantánea de croquetas.'
-        }}
-      </p>
 
       <!-- Main Action Button -->
       <div class="mt-6 w-full max-w-xs">
@@ -166,20 +153,16 @@ async function handleFeedClick() {
             v-else-if="isCoolingDown"
             class="w-6 h-6 text-slate-500"
           />
-          <Sparkles
-            v-else
-            class="w-6 h-6 text-white"
-          />
 
           <span>
             {{
               !deviceStore.isFirebaseConnected
                 ? 'Reconectando con la nube...'
                 : deviceStore.isDispensing
-                  ? 'Abriendo Compuerta...'
+                  ? 'Alimentando...'
                   : isCoolingDown
                     ? `Espera ${remainingSeconds}s`
-                    : 'Alimentar Ahora'
+                    : 'Alimentar'
             }}
           </span>
         </button>
@@ -210,7 +193,7 @@ async function handleFeedClick() {
           class="mt-4 px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2 shadow-sm"
         >
           <CheckCircle2 class="w-4 h-4 text-emerald-600" />
-          <span>¡Ración servida exitosamente por el ESP32!</span>
+          <span>¡Ración servida exitosamente!</span>
         </div>
       </transition>
     </div>
