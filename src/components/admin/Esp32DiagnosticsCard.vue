@@ -55,22 +55,6 @@ async function confirmReboot() {
           </p>
         </div>
       </div>
-
-      <!-- Online Status Badge -->
-      <div
-        class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold border shrink-0"
-        :class="[
-          deviceStore.isOnline
-            ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-            : 'bg-rose-50 border-rose-200 text-rose-800'
-        ]"
-      >
-        <span
-          class="w-2 h-2 rounded-full"
-          :class="deviceStore.isOnline ? 'bg-emerald-600' : 'bg-rose-600'"
-        ></span>
-        <span>{{ deviceStore.isOnline ? 'ESP32 conectado' : 'Desconectado' }}</span>
-      </div>
     </div>
 
     <!-- 3 Metrics Grid: Jakob Nielsen #8 (Minimalist design through progressive disclosure) -->
