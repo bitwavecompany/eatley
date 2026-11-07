@@ -125,6 +125,8 @@ function handleSubmit() {
         tipo_repeticion: tipoRepeticion.value,
         dias_semana: tipoRepeticion.value === 'dias_semana' ? diasSemana.value : [],
         fecha_especifica: tipoRepeticion.value === 'fecha_especifica' ? fechaEspecifica.value : null,
+        ultima_ejecucion_fecha: null,
+        omitida_hoy_fecha: null,
       },
     })
   } else {

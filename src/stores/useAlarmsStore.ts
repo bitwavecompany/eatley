@@ -119,7 +119,13 @@ export const useAlarmsStore = defineStore('alarms', () => {
   async function toggleAlarma(id: string): Promise<void> {
     const item = alarmas.value.find((a) => a.id === id)
     if (!item) return
-    await FeederRepository.actualizarAlarma(id, { activa: !item.activa })
+    const nextActiva = !item.activa
+    const payload: ActualizarAlarmaPayload = { activa: nextActiva }
+    if (nextActiva) {
+      payload.ultima_ejecucion_fecha = null
+      payload.omitida_hoy_fecha = null
+    }
+    await FeederRepository.actualizarAlarma(id, payload)
   }
 
   async function eliminarAlarma(id: string): Promise<void> {
