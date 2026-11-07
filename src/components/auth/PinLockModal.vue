@@ -91,17 +91,9 @@ async function handlePinSubmit() {
         <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/25 mb-4">
           <PawPrint class="w-9 h-9 text-white stroke-[2.2]" />
         </div>
-        <div class="flex items-center gap-1.5">
-          <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">
-            eat<span class="text-emerald-600">ley</span>
-          </h2>
-          <span class="text-[10px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
-            Seguridad
-          </span>
-        </div>
-        <p class="text-xs text-slate-500 mt-1">
-          Ingresa el PIN familiar para desbloquear el control del dispensador
-        </p>
+        <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">
+          eat<span class="text-emerald-600">ley</span>
+        </h2>
       </div>
 
       <!-- Error feedback banner -->
@@ -162,15 +154,9 @@ async function handlePinSubmit() {
         >
           <Loader2 v-if="cargando" class="w-4 h-4 animate-spin" />
           <KeyRound v-else class="w-4 h-4" />
-          <span>{{ cargando ? 'Verificando PIN...' : 'Desbloquear' }}</span>
+          <span>{{ cargando ? 'Verificando PIN...' : 'Ingresar' }}</span>
         </button>
       </form>
-
-      <!-- Footer Info -->
-      <div class="pt-2 border-t border-slate-100 text-[11px] text-slate-400 flex items-center justify-center gap-1.5">
-        <Lock class="w-3 h-3 text-emerald-600" />
-        <span>Conexión segura y encriptada por Firebase</span>
-      </div>
     </div>
   </div>
 </template>
