@@ -41,10 +41,10 @@ async function handleClearHistory() {
     <!-- Reusable Clear Confirmation Modal -->
     <ConfirmationModal
       :is-open="showConfirmClear"
-      title="¿Limpiar bitácora?"
+      title="¿Limpiar historial?"
       subtitle="Esta acción no se puede deshacer"
-      description="Se borrarán todos los registros históricos guardados en Firebase. Los nuevos eventos que ocurran se registrarán normalmente."
-      confirm-text="Sí, borrar todo"
+      description="Se borrará todo el historial de alimentación"
+      confirm-text="Aceptar"
       cancel-text="Cancelar"
       @close="showConfirmClear = false"
       @confirm="handleClearHistory"
