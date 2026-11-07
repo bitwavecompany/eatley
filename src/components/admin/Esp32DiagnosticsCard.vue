@@ -22,7 +22,7 @@ async function confirmReboot() {
           <Cpu class="w-6 h-6" />
         </div>
         <div>
-          <h3 class="text-lg font-bold text-slate-900">Telemetría ESP32 NodeMCU (38 Pines)</h3>
+          <h3 class="text-lg font-bold text-slate-900">Telemetría ESP32 NodeMCU (38 pines)</h3>
           <p class="text-xs text-slate-500">Diagnóstico en tiempo real y comandos remotos para ESP-WROOM-32</p>
         </div>
       </div>
@@ -40,7 +40,7 @@ async function confirmReboot() {
           class="w-2 h-2 rounded-full"
           :class="deviceStore.isOnline ? 'bg-emerald-600' : 'bg-rose-600'"
         ></span>
-        <span>{{ deviceStore.isOnline ? 'ESP32 Conectado' : 'Sin Comunicación' }}</span>
+        <span>{{ deviceStore.isOnline ? 'ESP32 conectado' : 'Sin comunicación' }}</span>
       </div>
     </div>
 
@@ -48,7 +48,7 @@ async function confirmReboot() {
     <div class="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
       <!-- Metric 1: Heartbeat -->
       <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-        <span class="text-xs font-medium text-slate-500 block">Último Latido</span>
+        <span class="text-xs font-medium text-slate-500 block">Último latido</span>
         <span class="text-lg sm:text-xl font-bold font-mono text-slate-900 mt-1 block">
           {{ deviceStore.estadoEsp32 ? `${deviceStore.secondsSinceHeartbeat}s` : '--' }}
         </span>
@@ -68,7 +68,7 @@ async function confirmReboot() {
 
       <!-- Metric 3: Uptime -->
       <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-        <span class="text-xs font-medium text-slate-500 block">Tiempo Activo</span>
+        <span class="text-xs font-medium text-slate-500 block">Tiempo activo</span>
         <span class="text-sm sm:text-base font-bold font-mono text-slate-900 mt-1.5 block truncate">
           {{ deviceStore.estadoEsp32 ? deviceStore.uptimeFormatted : '--' }}
         </span>
@@ -77,7 +77,7 @@ async function confirmReboot() {
 
       <!-- Metric 4: Free Memory -->
       <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-        <span class="text-xs font-medium text-slate-500 block">RAM Libre</span>
+        <span class="text-xs font-medium text-slate-500 block">RAM libre</span>
         <span class="text-lg sm:text-xl font-bold font-mono text-slate-900 mt-1 block">
           {{ deviceStore.estadoEsp32?.memoria_libre_kb ? `${deviceStore.estadoEsp32.memoria_libre_kb} KB` : '--' }}
         </span>
@@ -89,19 +89,19 @@ async function confirmReboot() {
     <div class="mt-5 p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-700">
       <div class="flex items-center gap-2 font-bold text-slate-800 mb-2">
         <Info class="w-4 h-4 text-blue-600" />
-        <span>Distribución Segura de Pines (ESP32 38 Pines):</span>
+        <span>Distribución segura de pines (ESP32 38 pines):</span>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] font-mono">
         <div class="p-2 rounded-lg bg-white border border-slate-200 shadow-sm">
           <span class="text-emerald-700 font-bold block">GPIO 18 (G18):</span>
-          <span class="text-slate-600">PWM MG996R (Naranja)</span>
+          <span class="text-slate-600">PWM MG996R (naranja)</span>
         </div>
         <div class="p-2 rounded-lg bg-white border border-slate-200 shadow-sm">
           <span class="text-teal-700 font-bold block">GPIO 21 (G21):</span>
-          <span class="text-slate-600">Microswitch (Pull-up)</span>
+          <span class="text-slate-600">Microswitch (pull-up)</span>
         </div>
         <div class="p-2 rounded-lg bg-white border border-slate-200 shadow-sm">
-          <span class="text-rose-700 font-bold block">Pines Prohibidos:</span>
+          <span class="text-rose-700 font-bold block">Pines prohibidos:</span>
           <span class="text-slate-600">SD0-SD3, CMD, CLK</span>
         </div>
       </div>
@@ -144,7 +144,7 @@ async function confirmReboot() {
       title="¿Reiniciar ESP32?"
       subtitle="Se reiniciará el microcontrolador remoto"
       description="Esta acción enviará la orden 'reiniciar_esp32' a Firebase. El microcontrolador ejecutará un reinicio suave (ESP.restart()) y volverá a conectarse a la red en unos segundos."
-      confirm-text="Confirmar Reinicio"
+      confirm-text="Confirmar reinicio"
       cancel-text="Cancelar"
       :icon="AlertTriangle"
       @close="showConfirmReboot = false"

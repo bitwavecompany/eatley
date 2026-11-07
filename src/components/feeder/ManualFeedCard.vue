@@ -117,10 +117,10 @@ async function handleFeedClick() {
       <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
         {{
           !deviceStore.isFirebaseConnected
-            ? 'Sin Conexión con la Nube'
+            ? 'Sin conexión con la nube'
             : deviceStore.isDispensing
-              ? 'Dispensando Alimento...'
-              : 'Alimentar Manualmente'
+              ? 'Dispensando alimento...'
+              : 'Alimentar manualmente'
         }}
       </h2>
 

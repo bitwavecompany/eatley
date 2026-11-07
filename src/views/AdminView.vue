@@ -7,7 +7,7 @@ import OperationalRulesForm from '@/components/admin/OperationalRulesForm.vue'
 <template>
   <div class="space-y-6 pb-20 sm:pb-12">
     <div>
-      <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Configuración y Calibración</h2>
+      <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Configuración y calibración</h2>
     </div>
 
     <!-- 1. Live ESP32 Hardware Diagnostics -->

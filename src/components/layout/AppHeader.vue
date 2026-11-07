@@ -49,7 +49,7 @@ const configStore = useConfigStore()
           title="Modo Vacaciones activo: las alarmas están temporalmente congeladas"
         >
           <PauseCircle class="w-3.5 h-3.5 text-amber-600 shrink-0" />
-          <span class="hidden md:inline">Pausa Activa</span>
+          <span class="hidden md:inline">Pausa activa</span>
           <span class="md:hidden">Pausa</span>
         </div>
 
@@ -84,7 +84,7 @@ const configStore = useConfigStore()
 
           <!-- Label -->
           <span class="hidden md:inline">
-            {{ deviceStore.isOnline ? 'ESP32 Conectado' : 'ESP32 Offline' }}
+            {{ deviceStore.isOnline ? 'ESP32 conectado' : 'ESP32 offline' }}
           </span>
           <span class="md:hidden">
             {{ deviceStore.isOnline ? 'ESP32' : 'ESP32 Off' }}
@@ -116,10 +116,10 @@ const configStore = useConfigStore()
           type="button"
           @click="emit('logout')"
           class="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-slate-200 bg-white hover:bg-rose-50 hover:border-rose-200 text-slate-500 hover:text-rose-600 text-[11px] sm:text-xs font-semibold transition-all shadow-sm shrink-0"
-          title="Cerrar Sesión"
+          title="Cerrar sesión"
         >
           <LogOut class="w-3.5 h-3.5" />
-          <span class="hidden sm:inline">Cerrar Sesión</span>
+          <span class="hidden sm:inline">Cerrar sesión</span>
         </button>
       </div>
     </div>

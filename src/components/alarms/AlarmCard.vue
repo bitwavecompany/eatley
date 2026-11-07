@@ -27,7 +27,7 @@ const repetitionLabel = computed<string>(() => {
     dias.length === 5 &&
     [1, 2, 3, 4, 5].every((d) => dias.includes(d))
   ) {
-    return 'Lunes a Viernes'
+    return 'Lunes a viernes'
   }
   if (
     dias.length === 2 &&

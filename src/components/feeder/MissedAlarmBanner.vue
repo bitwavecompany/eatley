@@ -22,8 +22,8 @@ const { alarmasPerdidas, atenderAlarmaPerdida, omitirAlarmaPerdida } = useMissed
 
           <div>
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="text-xs font-bold uppercase tracking-wider text-rose-800 px-2 py-0.5 rounded bg-rose-100 border border-rose-200">
-                Alarma Perdida
+              <span class="text-xs font-semibold text-rose-800 px-2 py-0.5 rounded bg-rose-100 border border-rose-200">
+                Alarma perdida
               </span>
               <span class="text-xs text-rose-900 font-mono font-semibold">
                 Programada: {{ item.horaProgramada }}

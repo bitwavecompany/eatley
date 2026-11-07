@@ -93,7 +93,7 @@ export const DEFAULT_ALARM_LABELS = [
   'Desayuno',
   'Almuerzo',
   'Cena',
-  'Snack de Tarde',
+  'Snack de tarde',
 ] as const
 
 /**

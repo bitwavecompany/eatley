@@ -57,7 +57,7 @@ async function handleTestServo() {
           <Gauge class="w-6 h-6" />
         </div>
         <div>
-          <h3 class="text-lg font-bold text-slate-900">Calibración Servomotor MG996R</h3>
+          <h3 class="text-lg font-bold text-slate-900">Calibración servomotor MG996R</h3>
           <p class="text-xs text-slate-500">Ajusta los ángulos mecánicos y tiempos sin reprogramar el microcontrolador</p>
         </div>
       </div>
@@ -83,7 +83,7 @@ async function handleTestServo() {
           class="w-4 h-4 text-emerald-600"
         />
         <span>
-          {{ deviceStore.activeAdminCommand === 'probar_servo' ? 'Probando servo...' : 'Probar Servo en Seco' }}
+          {{ deviceStore.activeAdminCommand === 'probar_servo' ? 'Probando servo...' : 'Probar servo en seco' }}
         </span>
       </button>
     </div>
@@ -94,7 +94,7 @@ async function handleTestServo() {
       <div>
         <div class="flex items-center justify-between mb-2">
           <label class="text-sm font-semibold text-slate-700">
-            Ángulo de Cierre (Reposo)
+            Ángulo de cierre (reposo)
           </label>
           <span class="font-mono text-sm font-bold px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-emerald-700">
             {{ anguloCerrado }}°
@@ -118,7 +118,7 @@ async function handleTestServo() {
       <div>
         <div class="flex items-center justify-between mb-2">
           <label class="text-sm font-semibold text-slate-700">
-            Ángulo de Apertura
+            Ángulo de apertura
           </label>
           <span class="font-mono text-sm font-bold px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-emerald-700">
             {{ anguloAbierto }}°
@@ -142,7 +142,7 @@ async function handleTestServo() {
       <div>
         <div class="flex items-center justify-between mb-2">
           <label class="text-sm font-semibold text-slate-700">
-            Tiempo de Compuerta Abierta
+            Tiempo de compuerta abierta
           </label>
           <span class="font-mono text-sm font-bold px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-emerald-700">
             {{ tiempoAbiertoMs }} ms
@@ -167,7 +167,7 @@ async function handleTestServo() {
         <!-- Anti-jamming Shake -->
         <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
           <div>
-            <span class="text-sm font-semibold text-slate-900 block">Maniobra de Sacudida Anti-Atasco</span>
+            <span class="text-sm font-semibold text-slate-900 block">Maniobra de sacudida anti-atasco</span>
             <span class="text-xs text-slate-500">Aplica micro-oscilaciones de ±5° en el pico de la botella para desatorar croquetas grandes.</span>
           </div>
           <button
@@ -188,7 +188,7 @@ async function handleTestServo() {
         <!-- PWM Cutoff in Rest -->
         <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
           <div>
-            <span class="text-sm font-semibold text-slate-900 block">Corte de Pulso PWM en Reposo</span>
+            <span class="text-sm font-semibold text-slate-900 block">Corte de pulso PWM en reposo</span>
             <span class="text-xs text-slate-500">Desactiva el tren de pulsos tras cerrar para eliminar zumbido eléctrico y sobrecalentamiento del MG996R.</span>
           </div>
           <button
@@ -229,7 +229,7 @@ async function handleTestServo() {
             v-else
             class="w-4 h-4"
           />
-          <span>{{ configStore.isSaving ? 'Guardando...' : 'Guardar Calibración' }}</span>
+          <span>{{ configStore.isSaving ? 'Guardando...' : 'Guardar calibración' }}</span>
         </button>
       </div>
     </div>

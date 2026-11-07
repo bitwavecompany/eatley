@@ -150,7 +150,7 @@ const repetitionSummary = computed(() => {
   }
   const dias = diasSemana.value || []
   if (dias.length === 7) return 'Diario'
-  if (dias.length === 5 && [1, 2, 3, 4, 5].every((d) => dias.includes(d))) return 'Lunes a Viernes'
+  if (dias.length === 5 && [1, 2, 3, 4, 5].every((d) => dias.includes(d))) return 'Lunes a viernes'
   if (dias.length === 2 && [0, 6].every((d) => dias.includes(d))) return 'Fines de semana'
 
   const shortMap: Record<number, string> = {
@@ -323,7 +323,7 @@ function handleSubmit() {
               @touchstart.passive="handleTouchStart"
               @touchmove.passive="handleHourTouchMove"
             >
-              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">H</span>
+              <span class="text-[11px] font-bold text-slate-400 mb-1">H</span>
 
               <!-- Previous Hour (-1) -->
               <button
@@ -356,7 +356,7 @@ function handleSubmit() {
               @touchstart.passive="handleTouchStart"
               @touchmove.passive="handleMinuteTouchMove"
             >
-              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">M</span>
+              <span class="text-[11px] font-bold text-slate-400 mb-1">M</span>
 
               <!-- Previous Minute (-1) -->
               <button
@@ -394,7 +394,7 @@ function handleSubmit() {
               class="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-slate-100 transition-colors group"
             >
               <div>
-                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Repetición</span>
+                <span class="text-xs font-semibold text-slate-500 block">Repetición</span>
                 <span class="text-sm font-bold text-slate-900 mt-0.5 block">{{ repetitionSummary }}</span>
               </div>
               <div class="flex items-center gap-1 text-emerald-700 font-semibold text-xs group-hover:translate-x-0.5 transition-transform">
@@ -406,7 +406,7 @@ function handleSubmit() {
 
           <!-- Dedicated Alarm Name Input Box -->
           <div class="space-y-1.5">
-            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+            <label class="block text-xs font-semibold text-slate-700">
               Nombre de la alarma
             </label>
             <input
@@ -426,7 +426,7 @@ function handleSubmit() {
             class="w-full mt-2 py-3 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 border border-rose-200/80 transition-colors shadow-sm"
           >
             <Trash2 class="w-4 h-4" />
-            <span>Eliminar esta alarma</span>
+            <span>Eliminar</span>
           </button>
         </div>
       </div>
@@ -479,7 +479,7 @@ function handleSubmit() {
                 class="text-sm font-semibold"
                 :class="tipoRepeticion === 'dias_semana' && diasSemana.length === 7 ? 'text-emerald-700' : 'text-slate-800'"
               >
-                Diario (Todos los días)
+                Diario (todos los días)
               </span>
               <Check
                 v-if="tipoRepeticion === 'dias_semana' && diasSemana.length === 7"
@@ -503,7 +503,7 @@ function handleSubmit() {
                     : 'text-slate-800'
                 "
               >
-                Lunes a Viernes
+                Lunes a viernes
               </span>
               <Check
                 v-if="

@@ -80,15 +80,15 @@ function formatTimestamp(ts: number): { time: string; date: string } {
             <span class="font-bold text-sm text-slate-900">
               {{
                 ev.origen === 'alarma'
-                  ? ev.alarma_etiqueta || 'Alarma Programada'
+                  ? ev.alarma_etiqueta || 'Alarma programada'
                   : ev.origen === 'manual'
-                    ? 'Disparo Manual'
-                    : 'Prueba Técnica de Servo'
+                    ? 'Disparo manual'
+                    : 'Prueba técnica de servo'
               }}
             </span>
 
             <span
-              class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full"
+              class="text-[10px] font-semibold capitalize px-2 py-0.5 rounded-full"
               :class="[
                 ev.origen === 'manual'
                   ? 'bg-emerald-100 text-emerald-800'
@@ -144,7 +144,7 @@ function formatTimestamp(ts: number): { time: string; date: string } {
             {{
               ev.confirmacion_microswitch === 'verificado'
                 ? 'Físico OK'
-                : 'Atasco Sensor'
+                : 'Atasco sensor'
             }}
           </span>
         </span>

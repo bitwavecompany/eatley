@@ -127,9 +127,9 @@ async function handleConfirmLogout() {
     <!-- Modal de Confirmación para Cerrar Sesión / Bloquear -->
     <ConfirmationModal
       :is-open="showLogoutModal"
-      title="¿Cerrar Sesión?"
+      title="¿Cerrar sesión?"
       description="Se cerrará la sesión actual"
-      confirm-text="Acepar"
+      confirm-text="Aceptar"
       cancel-text="Cancelar"
       variant="warning"
       :icon="LogOut"

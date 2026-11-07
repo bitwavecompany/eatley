@@ -47,7 +47,7 @@ async function handleSave() {
         <ShieldAlert class="w-6 h-6" />
       </div>
       <div>
-        <h3 class="text-lg font-bold text-slate-900">Reglas Operativas y Contingencia</h3>
+        <h3 class="text-lg font-bold text-slate-900">Reglas operativas y contingencia</h3>
         <p class="text-xs text-slate-500">Comportamiento ante cortes de energía, seguridad manual y sensores</p>
       </div>
     </div>
@@ -57,7 +57,7 @@ async function handleSave() {
       <div>
         <div class="flex items-center justify-between mb-2">
           <label class="text-sm font-semibold text-slate-700">
-            Tolerancia tras Corte Eléctrico
+            Tolerancia tras corte eléctrico
           </label>
           <span class="font-mono text-sm font-bold px-2 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-800">
             {{ toleranciaApagon }} min
@@ -83,7 +83,7 @@ async function handleSave() {
       <div>
         <div class="flex items-center justify-between mb-2">
           <label class="text-sm font-semibold text-slate-700">
-            Cooldown Anti-Doble Clic (Botón Manual)
+            Cooldown anti-doble clic (botón manual)
           </label>
           <span class="font-mono text-sm font-bold px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-emerald-700">
             {{ cooldownSeg }} seg
@@ -110,7 +110,7 @@ async function handleSave() {
         <!-- Modo Pausa Global -->
         <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
           <div>
-            <span class="text-sm font-semibold text-slate-900 block">Pausa Global del Sistema (Vacaciones)</span>
+            <span class="text-sm font-semibold text-slate-900 block">Pausa global del sistema (vacaciones)</span>
             <span class="text-xs text-slate-500">Congela la ejecución de todas las alarmas programadas sin borrarlas. El botón manual sigue disponible.</span>
           </div>
           <button
@@ -131,7 +131,7 @@ async function handleSave() {
         <!-- Soporte Microswitch -->
         <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
           <div>
-            <span class="text-sm font-semibold text-slate-900 block">Verificación Física por Microswitch (GPIO21)</span>
+            <span class="text-sm font-semibold text-slate-900 block">Verificación física por microswitch (GPIO21)</span>
             <span class="text-xs text-slate-500">Activa la comprobación mecánica del recorrido de la compuerta para registrar atascos en el historial.</span>
           </div>
           <button
@@ -172,7 +172,7 @@ async function handleSave() {
             v-else
             class="w-4 h-4"
           />
-          <span>{{ configStore.isSaving ? 'Guardando...' : 'Guardar Reglas' }}</span>
+          <span>{{ configStore.isSaving ? 'Guardando...' : 'Guardar reglas' }}</span>
         </button>
       </div>
     </div>

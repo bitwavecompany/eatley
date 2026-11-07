@@ -32,8 +32,8 @@ const historyStore = useHistoryStore()
           <AlarmClockCheck class="w-7 h-7" />
         </div>
         <div>
-          <span class="text-xs font-semibold uppercase tracking-wider text-emerald-700 block">
-            Próxima Comida Programada
+          <span class="text-xs font-semibold text-emerald-700 block">
+            Próxima comida programada
           </span>
           <div class="flex items-baseline gap-2 mt-0.5">
             <span class="text-3xl font-extrabold font-mono text-slate-900">
@@ -57,7 +57,7 @@ const historyStore = useHistoryStore()
         :to="APP_ROUTES.ALARMS"
         class="self-start sm:self-center px-4 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-colors flex items-center gap-1.5 shadow-sm"
       >
-        <span>Gestionar Horarios</span>
+        <span>Gestionar horarios</span>
         <ChevronRight class="w-4 h-4" />
       </RouterLink>
     </div>
@@ -70,7 +70,7 @@ const historyStore = useHistoryStore()
       <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
         <div class="flex items-center gap-2.5">
           <History class="w-5 h-5 text-slate-500" />
-          <h3 class="font-bold text-slate-900 text-base">Última Comida</h3>
+          <h3 class="font-bold text-slate-900 text-base">Última comida</h3>
         </div>
 
         <RouterLink

@@ -64,7 +64,7 @@ async function handleConfirmDelete() {
     <!-- Top Header -->
     <div class="flex items-center justify-between gap-4">
       <div>
-        <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Programar Alimentación</h2>
+        <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Programar alimentación</h2>
         <p
           v-if="alarmsStore.proximaAlarma"
           class="text-xs sm:text-sm font-semibold text-emerald-700 mt-1"
@@ -80,7 +80,7 @@ async function handleConfirmDelete() {
         class="hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-2xl font-bold text-sm text-white bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-600/20 active:scale-95 transition-all"
       >
         <Plus class="w-5 h-5" />
-        <span>Nueva Alarma</span>
+        <span>Nueva alarma</span>
       </button>
     </div>
 
@@ -91,7 +91,7 @@ async function handleConfirmDelete() {
     >
       <PauseCircle class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
       <div>
-        <span class="font-bold">El sistema se encuentra en Pausa Global (Modo Vacaciones).</span>
+        <span class="font-bold">El sistema se encuentra en pausa global (modo vacaciones).</span>
         <p class="text-amber-800/90 mt-0.5 text-xs">
           Ninguna de estas alarmas se ejecutará mientras la pausa esté activada. Puedes reactivar el cronograma normal desde la pestaña de <strong>Ajustes</strong>.
         </p>
@@ -107,16 +107,13 @@ async function handleConfirmDelete() {
         <AlarmClockPlus class="w-10 h-10" />
       </div>
       <h3 class="text-lg font-bold text-slate-900">No tienes alarmas programadas</h3>
-      <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-sm">
-        Crea tu primer horario para que tu mascota reciba su comida a la misma hora todos los días.
-      </p>
       <button
         type="button"
         @click="openCreateModal"
         class="mt-6 px-5 py-2.5 rounded-xl font-bold text-sm text-white bg-emerald-600 hover:bg-emerald-500 shadow-md shadow-emerald-600/20 transition-all flex items-center gap-2"
       >
         <Plus class="w-4 h-4" />
-        <span>Crear Primera Alarma</span>
+        <span>Crear primera alarma</span>
       </button>
     </div>
 
@@ -145,14 +142,14 @@ async function handleConfirmDelete() {
     <!-- Modal Confirmación de Eliminación de Alarma -->
     <ConfirmationModal
       :is-open="showConfirmDelete"
-      title="¿Eliminar Alarma?"
+      title="¿Eliminar alarma?"
       subtitle="Esta acción no se puede deshacer"
       :description="
         alarmToDelete
-          ? `¿Estás seguro de que deseas eliminar la alarma '${alarmToDelete.etiqueta}' programada a las ${alarmToDelete.hora}? El dispensador ya no se activará en ese horario.`
+          ? `¿Estás seguro de que deseas eliminar la alarma '${alarmToDelete.etiqueta}' programada a las ${alarmToDelete.hora}?`
           : '¿Estás seguro de que deseas eliminar esta alarma?'
       "
-      confirm-text="Sí, eliminar"
+      confirm-text="Aceptar"
       cancel-text="Cancelar"
       @close="showConfirmDelete = false"
       @confirm="handleConfirmDelete"
@@ -163,8 +160,8 @@ async function handleConfirmDelete() {
       type="button"
       @click="openCreateModal"
       class="sm:hidden fixed bottom-20 right-5 z-30 w-14 h-14 rounded-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white shadow-xl shadow-emerald-600/35 flex items-center justify-center transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-emerald-500/30 cursor-pointer"
-      title="Nueva Alarma"
-      aria-label="Nueva Alarma"
+      title="Nueva alarma"
+      aria-label="Nueva alarma"
     >
       <Plus class="w-7 h-7 stroke-[2.5]" />
     </button>
