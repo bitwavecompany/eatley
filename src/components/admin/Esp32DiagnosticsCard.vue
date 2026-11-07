@@ -1,13 +1,31 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Cpu, Info, Loader2, Power, AlertTriangle } from '@lucide/vue'
+import { ref, computed } from 'vue'
+import { Cpu, Loader2, Power, AlertTriangle } from '@lucide/vue'
 import { useDeviceStore } from '@/stores/useDeviceStore'
 import { useToastStore } from '@/stores/useToastStore'
 import ConfirmationModal from '@/components/common/ConfirmationModal.vue'
+import HelpTooltip from '@/components/common/HelpTooltip.vue'
 
 const deviceStore = useDeviceStore()
 const toastStore = useToastStore()
 const showConfirmReboot = ref(false)
+
+const wifiQuality = computed<{ label: string; color: string }>(() => {
+  if (!deviceStore.estadoEsp32) {
+    return { label: 'Sin señal', color: 'text-slate-400' }
+  }
+  switch (deviceStore.wifiLevel) {
+    case 'excelente':
+      return { label: 'Excelente', color: 'text-emerald-700' }
+    case 'buena':
+      return { label: 'Buena', color: 'text-emerald-600' }
+    case 'regular':
+      return { label: 'Regular', color: 'text-amber-700' }
+    case 'debil':
+    default:
+      return { label: 'Débil', color: 'text-rose-700' }
+  }
+})
 
 async function confirmReboot() {
   showConfirmReboot.value = false
@@ -22,21 +40,25 @@ async function confirmReboot() {
 
 <template>
   <div class="rounded-3xl border border-slate-200 bg-white p-6 sm:p-7 shadow-sm">
-    <!-- Header -->
-    <div class="flex items-center justify-between pb-5 border-b border-slate-100">
+    <!-- Header: Jakob Nielsen #1 (Visibility of system status) -->
+    <div class="flex items-center justify-between pb-5 border-b border-slate-100 gap-4">
       <div class="flex items-center gap-3">
-        <div class="p-2.5 rounded-2xl bg-blue-50 text-blue-600">
+        <div class="p-2.5 rounded-2xl bg-blue-50 text-blue-600 shrink-0">
           <Cpu class="w-6 h-6" />
         </div>
         <div>
-          <h3 class="text-lg font-bold text-slate-900">Telemetría ESP32 NodeMCU (38 pines)</h3>
-          <p class="text-xs text-slate-500">Diagnóstico en tiempo real y comandos remotos para ESP-WROOM-32</p>
+          <h3 class="text-lg font-bold text-slate-900 leading-tight">
+            Diagnóstico del controlador (ESP32)
+          </h3>
+          <p class="text-xs text-slate-500 mt-0.5">
+            Estado de conexión y salud del hardware en tiempo real
+          </p>
         </div>
       </div>
 
       <!-- Online Status Badge -->
       <div
-        class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold border"
+        class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold border shrink-0"
         :class="[
           deviceStore.isOnline
             ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
@@ -47,70 +69,73 @@ async function confirmReboot() {
           class="w-2 h-2 rounded-full"
           :class="deviceStore.isOnline ? 'bg-emerald-600' : 'bg-rose-600'"
         ></span>
-        <span>{{ deviceStore.isOnline ? 'ESP32 conectado' : 'Sin comunicación' }}</span>
+        <span>{{ deviceStore.isOnline ? 'ESP32 conectado' : 'Desconectado' }}</span>
       </div>
     </div>
 
-    <!-- 4 Metrics Grid -->
-    <div class="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-      <!-- Metric 1: Heartbeat -->
-      <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-        <span class="text-xs font-medium text-slate-500 block">Último latido</span>
-        <span class="text-lg sm:text-xl font-bold font-mono text-slate-900 mt-1 block">
-          {{ deviceStore.estadoEsp32 ? `${deviceStore.secondsSinceHeartbeat}s` : '--' }}
-        </span>
-        <span class="text-[10px] text-slate-400">segundos transcurridos</span>
-      </div>
-
-      <!-- Metric 2: RSSI Wi-Fi -->
-      <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-        <span class="text-xs font-medium text-slate-500 block">Calidad Wi-Fi</span>
-        <span class="text-lg sm:text-xl font-bold font-mono text-emerald-700 mt-1 block">
+    <!-- 3 Metrics Grid: Jakob Nielsen #8 (Minimalist design through progressive disclosure) -->
+    <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+      <!-- Metric 1: Calidad Wi-Fi -->
+      <div class="relative p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs font-medium text-slate-500">Calidad Wi-Fi</span>
+          <HelpTooltip
+            title="Calidad Wi-Fi"
+            text="Potencia de señal recibida (RSSI). Entre -30 y -60 dBm es señal excelente; entre -61 y -75 dBm es estable; peor a -80 dBm puede causar desconexiones o retrasos al dispensar."
+            position="bottom"
+            align="right"
+          />
+        </div>
+        <div class="my-1">
+          <span class="text-xl sm:text-2xl font-extrabold block truncate" :class="wifiQuality.color">
+            {{ wifiQuality.label }}
+          </span>
+        </div>
+        <span class="text-[11px] font-mono font-semibold text-slate-500">
           {{ deviceStore.estadoEsp32?.rssi_dbm ? `${deviceStore.estadoEsp32.rssi_dbm} dBm` : '--' }}
         </span>
-        <span class="text-[10px] text-slate-500 capitalize">
-          Señal {{ deviceStore.wifiLevel }}
+      </div>
+
+      <!-- Metric 2: Tiempo activo (Uptime) -->
+      <div class="relative p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs font-medium text-slate-500">Tiempo activo</span>
+          <HelpTooltip
+            title="Tiempo activo (Uptime)"
+            text="Tiempo continuo sin apagarse. Si este contador se reinicia a 0m sin que haya habido un corte de luz en casa, indica que el ESP32 sufrió una caída de voltaje (Brownout) al mover el servomotor."
+            position="bottom"
+            align="right"
+          />
+        </div>
+        <div class="my-1">
+          <span class="text-xl sm:text-2xl font-extrabold font-mono text-slate-900 block truncate">
+            {{ deviceStore.estadoEsp32 ? deviceStore.uptimeFormatted : '--' }}
+          </span>
+        </div>
+        <span class="text-[11px] text-slate-500">
+          desde el último encendido
         </span>
       </div>
 
-      <!-- Metric 3: Uptime -->
-      <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-        <span class="text-xs font-medium text-slate-500 block">Tiempo activo</span>
-        <span class="text-sm sm:text-base font-bold font-mono text-slate-900 mt-1.5 block truncate">
-          {{ deviceStore.estadoEsp32 ? deviceStore.uptimeFormatted : '--' }}
+      <!-- Metric 3: Último latido (Sincronización) -->
+      <div class="relative p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs font-medium text-slate-500">Último latido</span>
+          <HelpTooltip
+            title="Último latido (Sincronización)"
+            text="Tiempo desde la última vez que el ESP32 reportó su estado a Firebase. Si supera el tiempo límite configurado sin responder, el sistema se marcará como desconectado."
+            position="bottom"
+            align="right"
+          />
+        </div>
+        <div class="my-1">
+          <span class="text-xl sm:text-2xl font-extrabold font-mono text-slate-900 block">
+            {{ deviceStore.estadoEsp32 ? `${deviceStore.secondsSinceHeartbeat}s` : '--' }}
+          </span>
+        </div>
+        <span class="text-[11px] text-slate-500">
+          {{ deviceStore.estadoEsp32 ? `hace ${deviceStore.secondsSinceHeartbeat} segundos` : 'sin sincronizar' }}
         </span>
-        <span class="text-[10px] text-slate-400">desde último encendido</span>
-      </div>
-
-      <!-- Metric 4: Free Memory -->
-      <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-        <span class="text-xs font-medium text-slate-500 block">RAM libre</span>
-        <span class="text-lg sm:text-xl font-bold font-mono text-slate-900 mt-1 block">
-          {{ deviceStore.estadoEsp32?.memoria_libre_kb ? `${deviceStore.estadoEsp32.memoria_libre_kb} KB` : '--' }}
-        </span>
-        <span class="text-[10px] text-slate-400">memoria de ejecución</span>
-      </div>
-    </div>
-
-    <!-- Safe Pinout Reference Box -->
-    <div class="mt-5 p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-700">
-      <div class="flex items-center gap-2 font-bold text-slate-800 mb-2">
-        <Info class="w-4 h-4 text-blue-600" />
-        <span>Distribución segura de pines (ESP32 38 pines):</span>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] font-mono">
-        <div class="p-2 rounded-lg bg-white border border-slate-200 shadow-sm">
-          <span class="text-emerald-700 font-bold block">GPIO 18 (G18):</span>
-          <span class="text-slate-600">PWM MG996R (naranja)</span>
-        </div>
-        <div class="p-2 rounded-lg bg-white border border-slate-200 shadow-sm">
-          <span class="text-teal-700 font-bold block">GPIO 21 (G21):</span>
-          <span class="text-slate-600">Microswitch (pull-up)</span>
-        </div>
-        <div class="p-2 rounded-lg bg-white border border-slate-200 shadow-sm">
-          <span class="text-rose-700 font-bold block">Pines prohibidos:</span>
-          <span class="text-slate-600">SD0-SD3, CMD, CLK</span>
-        </div>
       </div>
     </div>
 
@@ -126,10 +151,16 @@ async function confirmReboot() {
       <span class="text-[11px] text-amber-700">Esperando ejecución...</span>
     </div>
 
-    <!-- Actions Footer -->
-    <div class="mt-6 pt-5 border-t border-slate-100 flex items-center justify-between">
-      <div class="text-xs text-slate-500">
-        Reinicio por software mediante comando en RTDB
+    <!-- Actions Footer: Jakob Nielsen #5 (Error prevention) -->
+    <div class="mt-6 pt-5 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div class="flex items-center gap-1.5 text-xs text-slate-500">
+        <span>Reinicio remoto del microcontrolador</span>
+        <HelpTooltip
+          title="Reinicio remoto"
+          text="Envía una orden a Firebase para que el ESP32 ejecute un reinicio limpio de software (ESP.restart) sin borrar tus alarmas ni configuraciones."
+          position="top"
+          align="left"
+        />
       </div>
 
       <div>
@@ -137,7 +168,7 @@ async function confirmReboot() {
           type="button"
           @click="showConfirmReboot = true"
           :disabled="deviceStore.activeAdminCommand === 'reiniciar_esp32'"
-          class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-all flex items-center gap-2 shadow-sm"
+          class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-all flex items-center gap-2 shadow-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
         >
           <Power class="w-4 h-4" />
           <span>Reiniciar ESP32</span>
@@ -145,12 +176,12 @@ async function confirmReboot() {
       </div>
     </div>
 
-    <!-- Reusable Confirmation Modal -->
+    <!-- Reusable Confirmation Modal: Jakob Nielsen #5 (Error prevention) -->
     <ConfirmationModal
       :is-open="showConfirmReboot"
       title="¿Reiniciar ESP32?"
       subtitle="Se reiniciará el microcontrolador remoto"
-      description="Esta acción enviará la orden 'reiniciar_esp32' a Firebase. El microcontrolador ejecutará un reinicio suave (ESP.restart()) y volverá a conectarse a la red en unos segundos."
+      description="Esta acción enviará la orden 'reiniciar_esp32' a Firebase. El microcontrolador ejecutará un reinicio suave (ESP.restart()) sin borrar tus alarmas ni configuraciones y volverá a conectarse a la red en unos segundos."
       confirm-text="Confirmar reinicio"
       cancel-text="Cancelar"
       :icon="AlertTriangle"
