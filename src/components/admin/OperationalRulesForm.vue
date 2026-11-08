@@ -9,21 +9,27 @@ import { OPERATIONAL_CONSTRAINTS, clamp } from '@/config/constants'
 const configStore = useConfigStore()
 const toastStore = useToastStore()
 
-// Local editable copy for tolerance
+// Local editable copies
 const toleranciaApagon = ref(configStore.configuracion.tolerancia_apagon_min)
+const cooldownSeg = ref(configStore.configuracion.cooldown_manual_seg)
 const saveSuccess = ref(false)
 
 // Sync from Firebase
 watch(
-  () => configStore.configuracion.tolerancia_apagon_min,
-  (newVal) => {
-    toleranciaApagon.value = newVal
-  }
+  () => configStore.configuracion,
+  (cfg) => {
+    toleranciaApagon.value = cfg.tolerancia_apagon_min
+    cooldownSeg.value = cfg.cooldown_manual_seg
+  },
+  { deep: true }
 )
 
-// Dirty state: checks if current slider value differs from Firebase snapshot
+// Dirty state: checks if any value differs from Firebase snapshot
 const hayCambiosReglas = computed<boolean>(() => {
-  return Number(toleranciaApagon.value) !== configStore.configuracion.tolerancia_apagon_min
+  return (
+    Number(toleranciaApagon.value) !== configStore.configuracion.tolerancia_apagon_min ||
+    Number(cooldownSeg.value) !== configStore.configuracion.cooldown_manual_seg
+  )
 })
 
 async function handleSave() {
@@ -35,19 +41,27 @@ async function handleSave() {
       OPERATIONAL_CONSTRAINTS.TOLERANCIA_APAGON_MIN.MIN,
       OPERATIONAL_CONSTRAINTS.TOLERANCIA_APAGON_MIN.MAX
     )
+    const validatedCooldown = clamp(
+      Number(cooldownSeg.value),
+      OPERATIONAL_CONSTRAINTS.COOLDOWN_MANUAL_SEG.MIN,
+      OPERATIONAL_CONSTRAINTS.COOLDOWN_MANUAL_SEG.MAX
+    )
+
     toleranciaApagon.value = validatedTolerancia
+    cooldownSeg.value = validatedCooldown
 
     await configStore.actualizarConfiguracion({
       tolerancia_apagon_min: validatedTolerancia,
+      cooldown_manual_seg: validatedCooldown,
       usar_microswitch: false, // Fijo en false por defecto (sin sensor físico)
     })
     saveSuccess.value = true
-    toastStore.success('Regla de contingencia guardada')
+    toastStore.success('Reglas operativas guardadas')
     setTimeout(() => {
       saveSuccess.value = false
     }, 3000)
   } catch {
-    toastStore.error('Error al guardar la regla')
+    toastStore.error('Error al guardar las reglas')
   }
 }
 </script>
@@ -61,16 +75,17 @@ async function handleSave() {
       </div>
       <div>
         <h3 class="text-lg font-bold text-slate-900 leading-tight">
-          Seguridad y cortes de energía
+          Seguridad y reglas operativas
         </h3>
         <p class="text-xs text-slate-500 mt-0.5">
-          Margen de recuperación automática ante apagones
+          Margen de recuperación ante apagones y espera entre servidas
         </p>
       </div>
     </div>
 
-    <!-- Single Active Slider: Recuperación tras corte de luz -->
+    <!-- Sliders Section -->
     <div class="mt-6 space-y-6">
+      <!-- Slider 1: Recuperación tras corte de luz -->
       <div>
         <div class="flex items-start justify-between gap-3 mb-1">
           <div>
@@ -94,7 +109,6 @@ async function handleSave() {
           </span>
         </div>
 
-        <!-- Slider Range -->
         <div class="flex items-center gap-3 sm:gap-4 mt-2">
           <input
             type="range"
@@ -106,6 +120,45 @@ async function handleSave() {
           />
           <span class="text-xs font-mono font-medium text-slate-400 w-24 text-right shrink-0 whitespace-nowrap">
             1 - 120 min
+          </span>
+        </div>
+      </div>
+
+      <!-- Slider 2: Tiempo de espera del botón manual (Cooldown) -->
+      <div>
+        <div class="flex items-start justify-between gap-3 mb-1">
+          <div>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <label class="text-sm font-semibold text-slate-800">
+                Tiempo de espera del botón manual
+              </label>
+              <HelpTooltip
+                title="Tiempo de espera del botón manual"
+                text="Protección anti-doble clic: segundos que el botón de dispensación manual permanece inactivo tras ser presionado, evitando sobrealimentar a la mascota por accidentes o impaciencia."
+                position="top"
+                align="left"
+              />
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">
+              Bloqueo temporal del botón tras dispensar para evitar pulsaciones repetidas por error.
+            </p>
+          </div>
+          <span class="font-mono text-sm font-bold px-2.5 py-1 rounded-xl bg-slate-100 border border-slate-200 text-emerald-700 shrink-0">
+            {{ cooldownSeg }} s
+          </span>
+        </div>
+
+        <div class="flex items-center gap-3 sm:gap-4 mt-2">
+          <input
+            type="range"
+            v-model.number="cooldownSeg"
+            :min="OPERATIONAL_CONSTRAINTS.COOLDOWN_MANUAL_SEG.MIN"
+            :max="OPERATIONAL_CONSTRAINTS.COOLDOWN_MANUAL_SEG.MAX"
+            :step="OPERATIONAL_CONSTRAINTS.COOLDOWN_MANUAL_SEG.STEP"
+            class="w-full h-11 py-3 cursor-pointer accent-emerald-600 bg-transparent flex-1 touch-manipulation"
+          />
+          <span class="text-xs font-mono font-medium text-slate-400 w-24 text-right shrink-0 whitespace-nowrap">
+            3 - 60 s
           </span>
         </div>
       </div>
