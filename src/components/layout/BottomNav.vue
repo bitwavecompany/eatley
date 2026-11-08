@@ -42,7 +42,7 @@ function isActive(path: string): boolean {
 
 <template>
   <nav
-    class="fixed bottom-0 inset-x-0 z-40 bg-white/90 backdrop-blur-lg border-t border-slate-200 px-2 py-1.5 pb-safe sm:py-2 shadow-lg"
+    class="fixed bottom-0 inset-x-0 z-40 bg-white/90 backdrop-blur-lg border-t border-slate-200 px-2 py-1.5 pb-safe sm:py-2 shadow-lg md:hidden"
     aria-label="Navegación principal"
   >
     <div class="max-w-md mx-auto grid grid-cols-4 gap-1">

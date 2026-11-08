@@ -9,6 +9,7 @@ import { useConfigStore } from '@/stores/useConfigStore'
 import { useHistoryStore } from '@/stores/useHistoryStore'
 import EnvWarningBanner from '@/components/layout/EnvWarningBanner.vue'
 import AppHeader from '@/components/layout/AppHeader.vue'
+import AppSidebar from '@/components/layout/AppSidebar.vue'
 import BottomNav from '@/components/layout/BottomNav.vue'
 import PinLockModal from '@/components/auth/PinLockModal.vue'
 import ConfirmationModal from '@/components/common/ConfirmationModal.vue'
@@ -95,35 +96,41 @@ async function handleConfirmLogout() {
   <PinLockModal v-else-if="!currentUser" />
 
   <!-- 3. Interfaz Principal de la Aplicación si el usuario está autenticado -->
-  <div v-else class="min-h-screen flex flex-col bg-slate-50 text-slate-900">
-    <!-- Unconfigured Firebase Warning Banner -->
-    <EnvWarningBanner />
+  <div v-else class="min-h-screen bg-slate-50 text-slate-900">
+    <!-- Desktop Vertical Left Sidebar (hidden on mobile) -->
+    <AppSidebar @logout="showLogoutModal = true" />
 
-    <!-- Top App Header con botón de cierre de sesión -->
-    <AppHeader
-      :is-authenticated="true"
-      @logout="showLogoutModal = true"
-    />
+    <!-- Main Viewport Layout: shifts on desktop with pl-64 -->
+    <div class="md:pl-64 flex flex-col min-h-screen">
+      <!-- Unconfigured Firebase Warning Banner -->
+      <EnvWarningBanner />
 
-    <!-- Main Content View Area -->
-    <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 pt-6">
-      <RouterView v-slot="{ Component }">
-        <transition
-          enter-active-class="transition duration-150 ease-out"
-          enter-from-class="opacity-0 translate-y-1"
-          enter-to-class="opacity-100 translate-y-0"
-          leave-active-class="transition duration-100 ease-in"
-          leave-from-class="opacity-100 translate-y-0"
-          leave-to-class="opacity-0 translate-y-1"
-          mode="out-in"
-        >
-          <component :is="Component" />
-        </transition>
-      </RouterView>
-    </main>
+      <!-- Top App Header con botón de cierre de sesión -->
+      <AppHeader
+        :is-authenticated="true"
+        @logout="showLogoutModal = true"
+      />
 
-    <!-- Bottom Navigation Bar -->
-    <BottomNav />
+      <!-- Main Content View Area -->
+      <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-24 md:pb-12">
+        <RouterView v-slot="{ Component }">
+          <transition
+            enter-active-class="transition duration-150 ease-out"
+            enter-from-class="opacity-0 translate-y-1"
+            enter-to-class="opacity-100 translate-y-0"
+            leave-active-class="transition duration-100 ease-in"
+            leave-from-class="opacity-100 translate-y-0"
+            leave-to-class="opacity-0 translate-y-1"
+            mode="out-in"
+          >
+            <component :is="Component" />
+          </transition>
+        </RouterView>
+      </main>
+
+      <!-- Bottom Navigation Bar (hidden on desktop) -->
+      <BottomNav />
+    </div>
 
     <!-- Modal de Confirmación para Cerrar Sesión / Bloquear -->
     <ConfirmationModal
