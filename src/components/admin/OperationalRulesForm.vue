@@ -1,78 +1,100 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { ShieldAlert, CheckCircle, Loader2, Save } from '@lucide/vue'
+import { ref, computed, watch } from 'vue'
+import { ShieldAlert, Loader2, Save, Check } from '@lucide/vue'
 import { useConfigStore } from '@/stores/useConfigStore'
 import { useToastStore } from '@/stores/useToastStore'
-import { OPERATIONAL_CONSTRAINTS } from '@/config/constants'
+import HelpTooltip from '@/components/common/HelpTooltip.vue'
+import { OPERATIONAL_CONSTRAINTS, clamp } from '@/config/constants'
 
 const configStore = useConfigStore()
 const toastStore = useToastStore()
 
+// Local editable copy for tolerance
 const toleranciaApagon = ref(configStore.configuracion.tolerancia_apagon_min)
-const cooldownSeg = ref(configStore.configuracion.cooldown_manual_seg)
-const sistemaPausado = ref(configStore.configuracion.sistema_pausado)
-const usarMicroswitch = ref(configStore.configuracion.usar_microswitch)
-
 const saveSuccess = ref(false)
 
+// Sync from Firebase
 watch(
-  () => configStore.configuracion,
-  (cfg) => {
-    toleranciaApagon.value = cfg.tolerancia_apagon_min
-    cooldownSeg.value = cfg.cooldown_manual_seg
-    sistemaPausado.value = cfg.sistema_pausado
-    usarMicroswitch.value = cfg.usar_microswitch
-  },
-  { deep: true }
+  () => configStore.configuracion.tolerancia_apagon_min,
+  (newVal) => {
+    toleranciaApagon.value = newVal
+  }
 )
 
+// Dirty state: checks if current slider value differs from Firebase snapshot
+const hayCambiosReglas = computed<boolean>(() => {
+  return Number(toleranciaApagon.value) !== configStore.configuracion.tolerancia_apagon_min
+})
+
 async function handleSave() {
+  if (!hayCambiosReglas.value || configStore.isSaving) return
   saveSuccess.value = false
   try {
+    const validatedTolerancia = clamp(
+      Number(toleranciaApagon.value),
+      OPERATIONAL_CONSTRAINTS.TOLERANCIA_APAGON_MIN.MIN,
+      OPERATIONAL_CONSTRAINTS.TOLERANCIA_APAGON_MIN.MAX
+    )
+    toleranciaApagon.value = validatedTolerancia
+
     await configStore.actualizarConfiguracion({
-      tolerancia_apagon_min: Number(toleranciaApagon.value),
-      cooldown_manual_seg: Number(cooldownSeg.value),
-      sistema_pausado: Boolean(sistemaPausado.value),
-      usar_microswitch: Boolean(usarMicroswitch.value),
+      tolerancia_apagon_min: validatedTolerancia,
+      usar_microswitch: false, // Fijo en false por defecto (sin sensor físico)
     })
     saveSuccess.value = true
-    toastStore.success('Reglas guardadas')
+    toastStore.success('Regla de contingencia guardada')
     setTimeout(() => {
       saveSuccess.value = false
     }, 3000)
   } catch {
-    toastStore.error('Error al guardar reglas')
+    toastStore.error('Error al guardar la regla')
   }
 }
 </script>
 
 <template>
   <div class="rounded-3xl border border-slate-200 bg-white p-6 sm:p-7 shadow-sm">
-    <!-- Header -->
+    <!-- Header: Jakob Nielsen #2 (Match between system and real world) -->
     <div class="flex items-center gap-3 pb-5 border-b border-slate-100">
-      <div class="p-2.5 rounded-2xl bg-amber-50 text-amber-600">
+      <div class="p-2.5 rounded-2xl bg-amber-50 text-amber-600 shrink-0">
         <ShieldAlert class="w-6 h-6" />
       </div>
       <div>
-        <h3 class="text-lg font-bold text-slate-900">Reglas operativas y contingencia</h3>
-        <p class="text-xs text-slate-500">Comportamiento ante cortes de energía, seguridad manual y sensores</p>
+        <h3 class="text-lg font-bold text-slate-900 leading-tight">
+          Seguridad y cortes de energía
+        </h3>
+        <p class="text-xs text-slate-500 mt-0.5">
+          Margen de recuperación automática ante apagones
+        </p>
       </div>
     </div>
 
+    <!-- Single Active Slider: Recuperación tras corte de luz -->
     <div class="mt-6 space-y-6">
-      <!-- Tolerancia Apagón (1 a 120 min) -->
       <div>
-        <div class="flex items-center justify-between mb-2">
-          <label class="text-sm font-semibold text-slate-700">
-            Tolerancia tras corte eléctrico
-          </label>
-          <span class="font-mono text-sm font-bold px-2 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-800">
+        <div class="flex items-start justify-between gap-3 mb-1">
+          <div>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <label class="text-sm font-semibold text-slate-800">
+                Recuperación tras corte de luz
+              </label>
+              <HelpTooltip
+                title="Recuperación tras corte de luz"
+                text="Ventana de gracia: si ocurre un corte eléctrico a la hora de una alarma y la luz vuelve dentro de este tiempo, el ESP32 dispensará la porción de inmediato. Si el corte dura más tiempo, omitirá esa comida para evitar desfases y registrará un aviso."
+                position="top"
+                align="left"
+              />
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">
+              Margen de tiempo para servir una comida atrasada cuando regresa la energía.
+            </p>
+          </div>
+          <span class="font-mono text-sm font-bold px-2.5 py-1 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 shrink-0">
             {{ toleranciaApagon }} min
           </span>
         </div>
-        <p class="text-xs text-slate-500 mb-2">
-          Ventana de gracia: si la luz regresa dentro de este tiempo después de una alarma, el ESP32 la dispensará de inmediato; si pasa más tiempo, generará alerta de alarma perdida.
-        </p>
+
+        <!-- Slider Range -->
         <div class="flex items-center gap-3 sm:gap-4 mt-2">
           <input
             type="range"
@@ -82,108 +104,40 @@ async function handleSave() {
             :step="OPERATIONAL_CONSTRAINTS.TOLERANCIA_APAGON_MIN.STEP"
             class="w-full h-11 py-3 cursor-pointer accent-amber-500 bg-transparent flex-1 touch-manipulation"
           />
-          <span class="text-xs font-mono font-medium text-slate-400 w-20 sm:w-24 text-right shrink-0 whitespace-nowrap">1m - 120m</span>
-        </div>
-      </div>
-
-      <!-- Cooldown Manual (3 a 60 seg) -->
-      <div>
-        <div class="flex items-center justify-between mb-2">
-          <label class="text-sm font-semibold text-slate-700">
-            Cooldown anti-doble clic (botón manual)
-          </label>
-          <span class="font-mono text-sm font-bold px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-emerald-700">
-            {{ cooldownSeg }} seg
+          <span class="text-xs font-mono font-medium text-slate-400 w-24 text-right shrink-0 whitespace-nowrap">
+            1 - 120 min
           </span>
         </div>
-        <p class="text-xs text-slate-500 mb-2">
-          Tiempo en segundos que se bloquea el botón en la interfaz tras dispensar para evitar sobrealimentar por error.
-        </p>
-        <div class="flex items-center gap-3 sm:gap-4 mt-2">
-          <input
-            type="range"
-            v-model.number="cooldownSeg"
-            :min="OPERATIONAL_CONSTRAINTS.COOLDOWN_MANUAL_SEG.MIN"
-            :max="OPERATIONAL_CONSTRAINTS.COOLDOWN_MANUAL_SEG.MAX"
-            :step="OPERATIONAL_CONSTRAINTS.COOLDOWN_MANUAL_SEG.STEP"
-            class="w-full h-11 py-3 cursor-pointer accent-emerald-600 bg-transparent flex-1 touch-manipulation"
-          />
-          <span class="text-xs font-mono font-medium text-slate-400 w-20 sm:w-24 text-right shrink-0 whitespace-nowrap">3s - 60s</span>
-        </div>
       </div>
 
-      <!-- Switches -->
-      <div class="pt-4 border-t border-slate-100 space-y-3.5">
-        <!-- Modo Pausa Global -->
-        <div
-          @click="sistemaPausado = !sistemaPausado"
-          class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-200 hover:bg-slate-100/70 transition-colors cursor-pointer select-none"
-        >
-          <div class="pr-3">
-            <span class="text-sm font-semibold text-slate-900 block">Pausa global del sistema (vacaciones)</span>
-            <span class="text-xs text-slate-500">Congela la ejecución de todas las alarmas programadas sin borrarlas. El botón manual sigue disponible.</span>
-          </div>
-          <button
-            type="button"
-            role="switch"
-            :aria-checked="sistemaPausado"
-            class="relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-amber-500/20"
-            :class="sistemaPausado ? 'bg-amber-500' : 'bg-slate-300'"
-          >
-            <span
-              class="pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-              :class="sistemaPausado ? 'translate-x-5' : 'translate-x-0'"
-            />
-          </button>
-        </div>
-
-        <!-- Soporte Microswitch -->
-        <div
-          @click="usarMicroswitch = !usarMicroswitch"
-          class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-200 hover:bg-slate-100/70 transition-colors cursor-pointer select-none"
-        >
-          <div class="pr-3">
-            <span class="text-sm font-semibold text-slate-900 block">Verificación física por microswitch (GPIO21)</span>
-            <span class="text-xs text-slate-500">Activa la comprobación mecánica del recorrido de la compuerta para registrar atascos en el historial.</span>
-          </div>
-          <button
-            type="button"
-            role="switch"
-            :aria-checked="usarMicroswitch"
-            class="relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-            :class="usarMicroswitch ? 'bg-emerald-600' : 'bg-slate-300'"
-          >
-            <span
-              class="pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-              :class="usarMicroswitch ? 'translate-x-5' : 'translate-x-0'"
-            />
-          </button>
-        </div>
-      </div>
-
-      <!-- Action Footer -->
-      <div class="pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        <span v-if="saveSuccess" class="text-xs font-semibold text-emerald-700 flex items-center gap-1.5">
-          <CheckCircle class="w-4 h-4 text-emerald-600" />
-          ¡Reglas operativas actualizadas en Firebase!
-        </span>
-        <span v-else></span>
-
+      <!-- Action Footer: Dirty State & Mobile-First -->
+      <div class="pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3">
         <button
           type="button"
           @click="handleSave"
-          :disabled="configStore.isSaving"
-          class="w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-xl font-bold text-sm text-white bg-emerald-600 hover:bg-emerald-500 shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 touch-manipulation cursor-pointer"
+          :disabled="!hayCambiosReglas || configStore.isSaving"
+          class="w-full sm:w-auto min-h-[44px] px-5 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 touch-manipulation"
+          :class="[
+            hayCambiosReglas
+              ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-600/20 cursor-pointer active:scale-[0.98]'
+              : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none'
+          ]"
         >
           <Loader2
             v-if="configStore.isSaving"
             class="w-4 h-4 animate-spin"
           />
+          <Check
+            v-else-if="!hayCambiosReglas"
+            class="w-4 h-4 text-slate-400"
+          />
           <Save
             v-else
-            class="w-4 h-4"
+            class="w-4 h-4 text-white"
           />
-          <span>{{ configStore.isSaving ? 'Guardando...' : 'Guardar reglas' }}</span>
+          <span>
+            {{ configStore.isSaving ? 'Guardando...' : (hayCambiosReglas ? 'Guardar reglas' : 'Sin cambios pendientes') }}
+          </span>
         </button>
       </div>
     </div>
