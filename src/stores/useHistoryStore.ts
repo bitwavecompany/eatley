@@ -17,11 +17,6 @@ export const useHistoryStore = defineStore('history', () => {
     return historial.value.length
   })
 
-  const eventosHoy = computed<EventoHistorial[]>(() => {
-    const today = new Date().toDateString()
-    return historial.value.filter((e) => new Date(e.timestamp).toDateString() === today)
-  })
-
   function init() {
     if (isInitialized.value) return
     unsub = FeederRepository.subscribeHistorial((data) => {
@@ -44,7 +39,6 @@ export const useHistoryStore = defineStore('history', () => {
     isInitialized,
     ultimosTresEventos,
     totalEventos,
-    eventosHoy,
     init,
     destroy,
     limpiarHistorial,

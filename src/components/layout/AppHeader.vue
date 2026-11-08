@@ -11,10 +11,6 @@ import {
 import { useDeviceStore } from '@/stores/useDeviceStore'
 import { useConfigStore } from '@/stores/useConfigStore'
 
-defineProps<{
-  isAuthenticated?: boolean
-}>()
-
 const emit = defineEmits<{
   (e: 'logout'): void
 }>()
@@ -49,7 +45,7 @@ const configStore = useConfigStore()
           <span class="md:hidden">Pausa</span>
         </div>
 
-        <!-- 2. BADGE DISPOSITIVO (ESP32 Hardware Heartbeat) -->
+        <!-- ESP32 Last Response Telemetry Badge -->
         <div
           class="flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] sm:text-xs font-semibold transition-all shadow-sm shrink-0"
           :class="[
@@ -59,8 +55,8 @@ const configStore = useConfigStore()
           ]"
           :title="
             deviceStore.isOnline
-              ? `ESP32 en línea (Heartbeat: hace ${deviceStore.secondsSinceHeartbeat}s, Wi-Fi: ${deviceStore.estadoEsp32?.rssi_dbm ?? 0} dBm)`
-              : `ESP32 desconectado o sin energía (hace ${deviceStore.secondsSinceHeartbeat}s)`
+              ? `ESP32 en línea (Última respuesta: hace ${deviceStore.secondsSinceLastResponse}s, Wi-Fi: ${deviceStore.estadoEsp32?.rssi_dbm ?? 0} dBm)`
+              : `ESP32 desconectado o sin energía (hace ${deviceStore.secondsSinceLastResponse}s)`
           "
         >
           <!-- Hardware Icon -->

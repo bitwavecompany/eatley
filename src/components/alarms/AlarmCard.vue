@@ -9,7 +9,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'toggle', id: string): void
   (e: 'edit', alarma: Alarma): void
-  (e: 'delete', id: string): void
 }>()
 
 const repetitionLabel = computed<string>(() => {

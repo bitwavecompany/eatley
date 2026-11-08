@@ -9,9 +9,9 @@ export interface DisparoManual {
 export type ComandoAdmin = 'ninguno' | 'probar_servo' | 'reiniciar_esp32'
 
 export interface EstadoEsp32 {
-  ultima_conexion: number // Timestamp Unix ms del heartbeat
-  rssi_dbm: number // Calidad Wi-Fi dBm
-  uptime_seg: number // Segundos transcurridos desde encendido
+  ultima_conexion: number // Unix timestamp (ms) of the controller's last response
+  rssi_dbm: number // Wi-Fi signal strength in dBm
+  uptime_seg: number // Elapsed seconds since boot
   memoria_libre_kb: number
   alarma_perdida_id: string | null
   comando_admin: ComandoAdmin

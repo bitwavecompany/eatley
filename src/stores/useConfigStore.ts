@@ -16,7 +16,6 @@ export const useConfigStore = defineStore('config', () => {
   const isSystemPaused = computed<boolean>(() => configuracion.value.sistema_pausado)
   const cooldownDurationSec = computed<number>(() => configuracion.value.cooldown_manual_seg)
   const blackoutToleranceMin = computed<number>(() => configuracion.value.tolerancia_apagon_min)
-  const usesMicroswitch = computed<boolean>(() => configuracion.value.usar_microswitch)
 
   function init() {
     if (isInitialized.value) return
@@ -35,12 +34,6 @@ export const useConfigStore = defineStore('config', () => {
     }
   }
 
-  async function togglePausaGlobal(): Promise<void> {
-    await actualizarConfiguracion({
-      sistema_pausado: !configuracion.value.sistema_pausado,
-    })
-  }
-
   function destroy() {
     if (unsub) unsub()
     isInitialized.value = false
@@ -53,10 +46,8 @@ export const useConfigStore = defineStore('config', () => {
     isSystemPaused,
     cooldownDurationSec,
     blackoutToleranceMin,
-    usesMicroswitch,
     init,
     destroy,
     actualizarConfiguracion,
-    togglePausaGlobal,
   }
 })

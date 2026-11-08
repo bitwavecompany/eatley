@@ -1,6 +1,9 @@
 export interface AppEnv {
   appName: string
   timezone: string
+  auth: {
+    familyEmail: string
+  }
   firebase: {
     apiKey: string
     authDomain: string
@@ -22,7 +25,7 @@ const cleanDbUrl = rawDbUrl.replace(/\/+$/, '')
 const rawProjectId = (import.meta.env.VITE_FIREBASE_PROJECT_ID || '').trim()
 
 /**
- * Checks if the string is still a placeholder or empty
+ * Validates whether an environment string is still a dummy placeholder or empty.
  */
 function isPlaceholder(value: string): boolean {
   if (!value || value.trim() === '') return true
@@ -44,6 +47,9 @@ const isConfigured =
 export const env: AppEnv = {
   appName: import.meta.env.VITE_APP_NAME || 'eatley',
   timezone: import.meta.env.VITE_APP_TIMEZONE || 'America/Guayaquil',
+  auth: {
+    familyEmail: (import.meta.env.VITE_AUTH_FAMILY_EMAIL || 'familiadiaz@gmail.com').trim(),
+  },
   firebase: {
     apiKey: rawApiKey,
     authDomain: (import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '').trim(),

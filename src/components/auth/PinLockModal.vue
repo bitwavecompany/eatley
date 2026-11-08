@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue'
-import { signInWithEmailAndPassword } from 'firebase/auth'
 import { FirebaseError } from 'firebase/app'
-import { auth } from '@/services/firebase.client'
-import { AUTH_CONFIG } from '@/config/constants'
+import { FeederRepository } from '@/services/feeder.repository'
+import { env } from '@/config/env'
 import { useToastStore } from '@/stores/useToastStore'
 import {
   PawPrint,
@@ -36,12 +35,12 @@ async function handlePinSubmit() {
   const trimmedPin = pin.value.trim()
 
   if (!trimmedPin) {
-    errorMsg.value = 'Por favor ingresa el PIN familiar.'
+    errorMsg.value = 'Por favor ingresa la contraseña familiar.'
     focusInput()
     return
   }
 
-  if (!auth) {
+  if (!env.isFirebaseConfigured) {
     errorMsg.value = 'Firebase no está configurado en el archivo .env.'
     return
   }
@@ -49,9 +48,8 @@ async function handlePinSubmit() {
   cargando.value = true
 
   try {
-    await signInWithEmailAndPassword(auth, AUTH_CONFIG.FAMILY_EMAIL, trimmedPin)
+    await FeederRepository.signInWithPin(trimmedPin)
     toastStore.success('Sesión iniciada con éxito')
-    // El cambio de sesión es detectado en tiempo real por onAuthStateChanged en App.vue
   } catch (err: unknown) {
     pin.value = ''
     focusInput()
@@ -60,7 +58,7 @@ async function handlePinSubmit() {
       switch (err.code) {
         case 'auth/invalid-credential':
         case 'auth/wrong-password':
-          errorMsg.value = 'El PIN ingresado es incorrecto. Inténtalo nuevamente.'
+          errorMsg.value = 'La contraseña ingresada es incorrecta. Inténtalo nuevamente.'
           break
         case 'auth/user-not-found':
           errorMsg.value = 'La cuenta familiar no fue encontrada en Firebase Authentication.'
@@ -75,7 +73,7 @@ async function handlePinSubmit() {
           errorMsg.value = `Error de autenticación: ${err.message}`
       }
     } else {
-      errorMsg.value = 'Ocurrió un error inesperado al verificar el PIN.'
+      errorMsg.value = 'Ocurrió un error inesperado al verificar la contraseña.'
     }
   } finally {
     cargando.value = false
@@ -128,9 +126,8 @@ async function handlePinSubmit() {
             ref="pinInputRef"
             v-model="pin"
             :type="showPin ? 'text' : 'password'"
-            inputmode="numeric"
             autocomplete="current-password"
-            placeholder="Ingresa el PIN familiar"
+            placeholder="Ingresa la contraseña familiar"
             :disabled="cargando"
             class="w-full bg-slate-50 border border-slate-200 focus:bg-white focus:border-emerald-500 rounded-2xl pl-10 pr-11 py-3 text-center text-lg font-mono font-bold tracking-widest text-slate-900 placeholder:text-slate-400 placeholder:font-sans placeholder:text-sm placeholder:tracking-normal focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all disabled:opacity-60 shadow-inner"
           />

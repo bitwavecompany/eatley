@@ -7,8 +7,15 @@ import {
   remove,
   type Unsubscribe,
 } from 'firebase/database'
-import { getFirebaseDb } from './firebase.client'
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  type User,
+} from 'firebase/auth'
+import { getFirebaseDb, getFirebaseAuth } from './firebase.client'
 import { DB_PATHS, SERVO_CONSTRAINTS, OPERATIONAL_CONSTRAINTS } from '@/config/constants'
+import { env } from '@/config/env'
 import type {
   Alarma,
   CrearAlarmaPayload,
@@ -26,8 +33,9 @@ import type {
 } from '@/types/device.types'
 import type {
   EventoHistorial,
-  RegistrarEventoHistorialPayload,
 } from '@/types/history.types'
+
+export type { User }
 
 /**
  * Default fallback configuration
@@ -95,11 +103,47 @@ class LocalMockStore {
 const localMock = new LocalMockStore()
 
 /**
- * Feeder Repository: Central abstraction for Firebase Realtime Database
+ * Feeder Repository: Central abstraction for Firebase Realtime Database & Authentication
  */
 export const FeederRepository = {
   // ==========================================
-  // CONEXIÓN NUBE / FIREBASE (.info/connected)
+  // AUTHENTICATION
+  // ==========================================
+  /**
+   * Subscribes to Firebase Authentication state changes.
+   */
+  subscribeAuthState(callback: (user: User | null) => void): Unsubscribe {
+    const auth = getFirebaseAuth()
+    if (!auth) {
+      callback(null)
+      return () => {}
+    }
+    return onAuthStateChanged(auth, callback)
+  },
+
+  /**
+   * Signs in using the configured family email and the provided PIN/password.
+   */
+  async signInWithPin(pin: string): Promise<void> {
+    const auth = getFirebaseAuth()
+    if (!auth) {
+      throw new Error('Firebase Authentication is not configured.')
+    }
+    await signInWithEmailAndPassword(auth, env.auth.familyEmail, pin.trim())
+  },
+
+  /**
+   * Signs out the currently authenticated user.
+   */
+  async signOutUser(): Promise<void> {
+    const auth = getFirebaseAuth()
+    if (auth) {
+      await signOut(auth)
+    }
+  },
+
+  // ==========================================
+  // CLOUD / FIREBASE CONNECTION (.info/connected)
   // ==========================================
   subscribeToFirebaseConnection(callback: (isConnected: boolean) => void): Unsubscribe {
     const db = getFirebaseDb()
@@ -364,24 +408,6 @@ export const FeederRepository = {
 
       callback(list)
     })
-  },
-
-  async registrarEventoHistorial(payload: RegistrarEventoHistorialPayload): Promise<string> {
-    const db = getFirebaseDb()
-    if (!db) {
-      const newId = `evt-${Date.now()}`
-      const newEvent: EventoHistorial = { ...payload, id: newId }
-      localMock.historial.unshift(newEvent)
-      localMock.notifyHistorial()
-      return newId
-    }
-
-    const histRef = ref(db, DB_PATHS.HISTORIAL)
-    const newRef = push(histRef)
-    const id = newRef.key as string
-    const newEvent: EventoHistorial = { ...payload, id }
-    await set(newRef, newEvent)
-    return id
   },
 
   async limpiarHistorial(): Promise<void> {

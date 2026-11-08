@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterView } from 'vue-router'
-import { onAuthStateChanged, signOut, type User } from 'firebase/auth'
-import { auth } from '@/services/firebase.client'
+import { FeederRepository, type User } from '@/services/feeder.repository'
+import { env } from '@/config/env'
 import { useDeviceStore } from '@/stores/useDeviceStore'
 import { useAlarmsStore } from '@/stores/useAlarmsStore'
 import { useConfigStore } from '@/stores/useConfigStore'
@@ -25,6 +25,7 @@ const historyStore = useHistoryStore()
 const currentUser = ref<User | null>(null)
 const isAuthChecking = ref(true)
 const showLogoutModal = ref(false)
+let authUnsubscribe: (() => void) | null = null
 
 function initializeStores() {
   deviceStore.init()
@@ -34,38 +35,42 @@ function initializeStores() {
 }
 
 onMounted(() => {
-  if (!auth) {
-    // Si Firebase no está configurado (modo sin credenciales), saltar verificación
+  if (!env.isFirebaseConfigured) {
+    // When Firebase credentials are not provided (local demo mode), bypass auth checks
     isAuthChecking.value = false
     initializeStores()
     return
   }
 
-  onAuthStateChanged(auth, (user) => {
+  authUnsubscribe = FeederRepository.subscribeAuthState((user) => {
     currentUser.value = user
     isAuthChecking.value = false
 
     if (user) {
-      // Iniciar suscripciones a Realtime Database una vez autenticado con éxito
+      // Connect store listeners once successfully authenticated
       initializeStores()
     }
   })
 })
 
+onUnmounted(() => {
+  if (authUnsubscribe) {
+    authUnsubscribe()
+    authUnsubscribe = null
+  }
+})
+
 async function handleConfirmLogout() {
   showLogoutModal.value = false
-  if (auth) {
-    try {
-      deviceStore.destroy()
-      alarmsStore.destroy()
-      configStore.destroy()
-      historyStore.destroy()
-      await signOut(auth)
-      // Redirigir al home y recargar la ventana para reiniciar completamente el estado reactivo y sockets
-      window.location.href = APP_ROUTES.DASHBOARD
-    } catch (err) {
-      console.error('Error al cerrar sesión:', err)
-    }
+  try {
+    deviceStore.destroy()
+    alarmsStore.destroy()
+    configStore.destroy()
+    historyStore.destroy()
+    await FeederRepository.signOutUser()
+    window.location.href = APP_ROUTES.DASHBOARD
+  } catch (err) {
+    console.error('Error during logout:', err)
   }
 }
 </script>
@@ -105,11 +110,8 @@ async function handleConfirmLogout() {
       <!-- Unconfigured Firebase Warning Banner -->
       <EnvWarningBanner />
 
-      <!-- Top App Header con botón de cierre de sesión -->
-      <AppHeader
-        :is-authenticated="true"
-        @logout="showLogoutModal = true"
-      />
+      <!-- Top App Header with logout trigger -->
+      <AppHeader @logout="showLogoutModal = true" />
 
       <!-- Main Content View Area -->
       <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 md:pt-8 pb-24 md:pb-12">

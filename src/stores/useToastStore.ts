@@ -16,7 +16,9 @@ export const useToastStore = defineStore('toast', () => {
   }
 
   function show(message: string, type: ToastType = 'success', duration = 3000): string {
-    const id = `toast-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`
+    const id = typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `toast-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`
 
     // Limit visible toasts to 3 maximum
     if (toasts.value.length >= 3) {

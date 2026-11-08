@@ -114,7 +114,7 @@ async function confirmReboot() {
         </div>
         <div class="my-1">
           <span class="text-xl sm:text-2xl font-extrabold font-mono text-slate-900 block truncate">
-            {{ deviceStore.estadoEsp32 ? `Hace ${deviceStore.secondsSinceHeartbeat} s` : '--' }}
+            {{ deviceStore.estadoEsp32 ? `Hace ${deviceStore.secondsSinceLastResponse} s` : '--' }}
           </span>
         </div>
         <span class="text-[11px] text-slate-500">

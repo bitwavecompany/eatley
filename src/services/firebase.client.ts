@@ -88,7 +88,3 @@ export async function getCurrentUser(): Promise<User | null> {
   await authInstance.authStateReady()
   return authInstance.currentUser
 }
-
-// Instancia de Auth exportada directamente para su uso en la aplicación
-const app = getFirebaseApp()
-export const auth: Auth = (app ? getAuth(app) : null) as unknown as Auth

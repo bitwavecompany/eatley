@@ -32,14 +32,14 @@ export const useDeviceStore = defineStore('device', () => {
     return 'reconectando'
   })
 
-  // Hardware / ESP32 Heartbeat tracking
+  // Hardware / ESP32 last response telemetry tracking
   const isOnline = computed<boolean>(() => {
     if (!estadoEsp32.value?.ultima_conexion) return false
     const diffSec = (currentTime.value - estadoEsp32.value.ultima_conexion) / 1000
     return diffSec <= env.esp32OfflineThresholdSec
   })
 
-  const secondsSinceHeartbeat = computed<number>(() => {
+  const secondsSinceLastResponse = computed<number>(() => {
     if (!estadoEsp32.value?.ultima_conexion) return 9999
     return Math.max(0, Math.floor((currentTime.value - estadoEsp32.value.ultima_conexion) / 1000))
   })
@@ -76,7 +76,7 @@ export const useDeviceStore = defineStore('device', () => {
   function init() {
     if (isInitialized.value) return
 
-    // Live clock for heartbeat calculation
+    // Live timer for elapsed response calculation
     timerInterval = setInterval(() => {
       currentTime.value = Date.now()
     }, 1000)
@@ -127,7 +127,9 @@ export const useDeviceStore = defineStore('device', () => {
     isFirebaseConnected,
     firebaseConnectionStatus,
     isOnline,
-    secondsSinceHeartbeat,
+    secondsSinceLastResponse,
+    /** @deprecated Use secondsSinceLastResponse */
+    secondsSinceHeartbeat: secondsSinceLastResponse,
     wifiLevel,
     isDispensing,
     activeAdminCommand,

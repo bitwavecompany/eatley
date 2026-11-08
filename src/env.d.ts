@@ -3,6 +3,7 @@
 interface ImportMetaEnv {
   readonly VITE_APP_NAME: string
   readonly VITE_APP_TIMEZONE: string
+  readonly VITE_AUTH_FAMILY_EMAIL?: string
   readonly VITE_FIREBASE_API_KEY: string
   readonly VITE_FIREBASE_AUTH_DOMAIN: string
   readonly VITE_FIREBASE_DATABASE_URL: string
@@ -21,6 +22,6 @@ interface ImportMeta {
 
 declare module '*.vue' {
   import type { DefineComponent } from 'vue'
-  const component: DefineComponent<{}, {}, any>
+  const component: DefineComponent<{}, {}, unknown>
   export default component
 }

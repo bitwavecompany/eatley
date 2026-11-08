@@ -29,7 +29,7 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Calibración y Hardware', requiresAuth: true },
   },
   {
-    // Redireccionamiento de cualquier ruta inexistente al Home
+    // Catch-all route: redirect any unknown URL to Dashboard
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     redirect: APP_ROUTES.DASHBOARD,
@@ -44,17 +44,17 @@ export const router = createRouter({
   },
 })
 
-// Guardia de navegación global: protege rutas y evita acceso directo por URL sin credenciales
+// Global navigation guard: protects routes and prevents unauthorized deep linking
 router.beforeEach(async (to) => {
-  // Si Firebase no está configurado (modo desarrollo local/demo), permitir acceso
+  // If Firebase is not configured (local development or demo mode), allow access
   if (!env.isFirebaseConfigured) {
     return true
   }
 
-  // Espera a que Firebase determine el estado de la sesión persistida
+  // Await Firebase auth state resolution
   const user = await getCurrentUser()
 
-  // Si el usuario no está autenticado y no está en la raíz, redirige inmediatamente al Home
+  // If user is unauthenticated and navigating beyond dashboard, redirect to home/dashboard
   if (!user && to.path !== APP_ROUTES.DASHBOARD) {
     return { path: APP_ROUTES.DASHBOARD, replace: true }
   }
@@ -62,7 +62,7 @@ router.beforeEach(async (to) => {
   return true
 })
 
-// Actualización dinámica del título de la pestaña
+// Dynamic document title updater
 router.afterEach((to) => {
   const baseTitle = 'eatley'
   if (to.meta.title && typeof to.meta.title === 'string') {

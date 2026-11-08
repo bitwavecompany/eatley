@@ -42,7 +42,7 @@ El proyecto está diseñado bajo una arquitectura limpia y desacoplada de 4 capa
 
 4. **Monitoreo Dual de Conexión Obligatorio:**
    * **Nube / Firebase:** Suscripción al nodo de sistema `/.info/connected` en `FeederRepository.subscribeToFirebaseConnection()`. Refleja si el navegador web mantiene el WebSocket activo con Firebase.
-   * **Dispositivo / ESP32:** Se evalúa mediante la marca de tiempo de su heartbeat (`estado_esp32.ultima_conexion`) contra `VITE_ESP32_OFFLINE_THRESHOLD_SEC`.
+   * **Dispositivo / ESP32:** Se evalúa mediante la marca de tiempo de su última respuesta (`estado_esp32.ultima_conexion`) contra `VITE_ESP32_OFFLINE_THRESHOLD_SEC`.
    * **Ambos estados son independientes** y jamás deben mezclarse o unificarse en una sola bandera booleana.
 
 5. **Cero Datos Quemados (No Hardcoding):**

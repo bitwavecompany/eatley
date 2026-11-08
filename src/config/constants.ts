@@ -106,18 +106,8 @@ export const DAYS_OF_WEEK: readonly DayOfWeekItem[] = [
  * Family Authentication Configuration
  */
 export const AUTH_CONFIG = {
-  FAMILY_EMAIL: 'familiadiaz@gmail.com',
+  FAMILY_EMAIL: env.auth.familyEmail,
 } as const
-
-/**
- * Common quick alarm presets or labels
- */
-export const DEFAULT_ALARM_LABELS = [
-  'Desayuno',
-  'Almuerzo',
-  'Cena',
-  'Snack de tarde',
-] as const
 
 /**
  * App Route Constants

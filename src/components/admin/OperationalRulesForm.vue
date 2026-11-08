@@ -53,7 +53,7 @@ async function handleSave() {
     await configStore.actualizarConfiguracion({
       tolerancia_apagon_min: validatedTolerancia,
       cooldown_manual_seg: validatedCooldown,
-      usar_microswitch: false, // Fijo en false por defecto (sin sensor físico)
+      usar_microswitch: false, // Fixed to false (hardware operates without microswitch)
     })
     saveSuccess.value = true
     toastStore.success('Reglas operativas guardadas')
