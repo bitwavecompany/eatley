@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { Gauge, Loader2, Play, Save, Check, RotateCcw } from '@lucide/vue'
+import { Gauge, Loader2, Play, Save, Check, RotateCcw, Lock, Unlock } from '@lucide/vue'
 import { useConfigStore } from '@/stores/useConfigStore'
 import { useDeviceStore } from '@/stores/useDeviceStore'
 import { useToastStore } from '@/stores/useToastStore'
 import HelpTooltip from '@/components/common/HelpTooltip.vue'
-import { SERVO_CONSTRAINTS, SERVO_RECOMMENDED_DEFAULTS } from '@/config/constants'
+import UnlockClosureModal from '@/components/admin/UnlockClosureModal.vue'
+import { SERVO_CONSTRAINTS, SERVO_RECOMMENDED_DEFAULTS, CLOSURE_UNLOCK_KEYWORD } from '@/config/constants'
 
 const configStore = useConfigStore()
 const deviceStore = useDeviceStore()
@@ -20,6 +21,8 @@ const desactivarPulso = ref(configStore.configuracion.desactivar_pulso_en_reposo
 
 const saveSuccess = ref(false)
 const isTesting = ref(false)
+const isClosureLocked = ref(true)
+const showUnlockModal = ref(false)
 
 // Keep local state in sync when external configuration updates in Firebase
 watch(
@@ -87,13 +90,26 @@ async function handleTestMovement() {
   }
 }
 
+function handleUnlockConfirmed() {
+  isClosureLocked.value = false
+  showUnlockModal.value = false
+  toastStore.warning('Posición de cierre desbloqueada para ajuste manual')
+}
+
 function resetToDefaults() {
-  anguloCerrado.value = SERVO_RECOMMENDED_DEFAULTS.ANGULO_CERRADO
+  if (!isClosureLocked.value) {
+    anguloCerrado.value = SERVO_RECOMMENDED_DEFAULTS.ANGULO_CERRADO
+  }
   anguloAbierto.value = SERVO_RECOMMENDED_DEFAULTS.ANGULO_ABIERTO
   tiempoAbiertoMs.value = SERVO_RECOMMENDED_DEFAULTS.TIEMPO_ABIERTO_MS
   activarSacudida.value = SERVO_RECOMMENDED_DEFAULTS.ACTIVAR_SACUDIDA
   desactivarPulso.value = SERVO_RECOMMENDED_DEFAULTS.DESACTIVAR_PULSO
-  toastStore.info('Valores recomendados restablecidos en el formulario')
+
+  if (isClosureLocked.value) {
+    toastStore.info('Valores restablecidos (posición de cierre protegida sin cambios)')
+  } else {
+    toastStore.info('Valores recomendados restablecidos en el formulario')
+  }
 }
 </script>
 
@@ -116,11 +132,11 @@ function resetToDefaults() {
 
     <!-- Sliders and Inputs Section -->
     <div class="mt-6 space-y-6">
-      <!-- Slider 1: Posición de cierre (reposo) -->
+      <!-- Slider 1: Posición de cierre (reposo) - PROTEGIDO CONTRA DAÑOS MECÁNICOS -->
       <div>
         <div class="flex items-start justify-between gap-3 mb-1">
           <div>
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-1.5 flex-wrap">
               <label class="text-sm font-semibold text-slate-800">
                 Posición de cierre (reposo)
               </label>
@@ -135,23 +151,78 @@ function resetToDefaults() {
               Punto donde el brazo bloquea la salida.
             </p>
           </div>
-          <span class="font-mono text-sm font-bold px-2.5 py-1 rounded-xl bg-slate-100 border border-slate-200 text-emerald-700 shrink-0">
-            {{ anguloCerrado }}°
-          </span>
+
+          <div class="flex items-center gap-2 shrink-0">
+            <!-- Lock/Unlock State Toggle Button -->
+            <button
+              v-if="isClosureLocked"
+              type="button"
+              @click="showUnlockModal = true"
+              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-amber-50 border border-amber-200 text-amber-800 hover:bg-amber-100 transition-colors cursor-pointer touch-manipulation"
+              title="Toca para desbloquear la edición"
+            >
+              <Lock class="w-3.5 h-3.5 text-amber-600" />
+              <span>Bloqueado</span>
+            </button>
+            <button
+              v-else
+              type="button"
+              @click="isClosureLocked = true"
+              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-emerald-50 border border-emerald-200 text-emerald-800 hover:bg-emerald-100 transition-colors cursor-pointer touch-manipulation"
+              title="Toca para volver a proteger"
+            >
+              <Unlock class="w-3.5 h-3.5 text-emerald-600" />
+              <span>Desbloqueado</span>
+            </button>
+
+            <!-- Angle badge -->
+            <span
+              class="font-mono text-sm font-bold px-2.5 py-1 rounded-xl border shrink-0 transition-colors"
+              :class="isClosureLocked ? 'bg-slate-100 border-slate-200 text-slate-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'"
+            >
+              {{ anguloCerrado }}°
+            </span>
+          </div>
         </div>
-        <div class="flex items-center gap-3 sm:gap-4 mt-2">
+
+        <!-- Slider Range with Tap Interceptor when Locked -->
+        <div class="relative flex items-center gap-3 sm:gap-4 mt-2">
           <input
             type="range"
             v-model.number="anguloCerrado"
             :min="SERVO_CONSTRAINTS.ANGULO_CERRADO.MIN"
             :max="SERVO_CONSTRAINTS.ANGULO_CERRADO.MAX"
             :step="SERVO_CONSTRAINTS.ANGULO_CERRADO.STEP"
-            class="w-full h-11 py-3 cursor-pointer accent-emerald-600 bg-transparent flex-1 touch-manipulation"
+            :disabled="isClosureLocked"
+            class="w-full h-11 py-3 bg-transparent flex-1 touch-manipulation transition-opacity"
+            :class="[
+              isClosureLocked
+                ? 'opacity-40 cursor-not-allowed accent-slate-400'
+                : 'cursor-pointer accent-emerald-600'
+            ]"
           />
           <span class="text-xs font-mono font-medium text-slate-400 w-20 sm:w-24 text-right shrink-0 whitespace-nowrap">
             0° - 45°
           </span>
+
+          <!-- Touch/Click interceptor when locked -->
+          <div
+            v-if="isClosureLocked"
+            @click="showUnlockModal = true"
+            class="absolute inset-0 cursor-not-allowed"
+            title="Posición de cierre bloqueada. Toca para desbloquear."
+          ></div>
         </div>
+
+        <!-- Helper Hint when locked -->
+        <p
+          v-if="isClosureLocked"
+          @click="showUnlockModal = true"
+          class="text-[11px] text-amber-700 flex items-center gap-1.5 mt-1 cursor-pointer hover:underline touch-manipulation"
+        >
+          <Lock class="w-3 h-3 text-amber-600 shrink-0" />
+          <span>Edición protegida para evitar rotura mecánica. Toca para desbloquear.</span>
+        </p>
       </div>
 
       <!-- Slider 2: Posición de apertura -->
@@ -381,5 +452,13 @@ function resetToDefaults() {
         </div>
       </div>
     </div>
+
+    <!-- Unlock Confirmation Modal with Keyword Requirement -->
+    <UnlockClosureModal
+      :is-open="showUnlockModal"
+      :keyword="CLOSURE_UNLOCK_KEYWORD"
+      @confirm="handleUnlockConfirmed"
+      @close="showUnlockModal = false"
+    />
   </div>
 </template>

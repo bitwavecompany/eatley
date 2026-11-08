@@ -50,6 +50,11 @@ export const SERVO_RECOMMENDED_DEFAULTS = {
 } as const
 
 /**
+ * Keyword required to unlock critical mechanical closure angle
+ */
+export const CLOSURE_UNLOCK_KEYWORD = 'DESBLOQUEAR'
+
+/**
  * Operational Contingency Rules
  */
 export const OPERATIONAL_CONSTRAINTS = {
