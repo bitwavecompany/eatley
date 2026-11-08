@@ -18,25 +18,32 @@ export const DB_PATHS = {
 export const SERVO_CONSTRAINTS = {
   ANGULO_CERRADO: {
     MIN: 0,
-    MAX: 45,
+    MAX: 15,
     DEFAULT: 0,
     STEP: 1,
   },
   ANGULO_ABIERTO: {
-    MIN: 30,
-    MAX: 180,
-    DEFAULT: 45,
+    MIN: 35,
+    MAX: 90,
+    DEFAULT: 50,
     STEP: 1,
   },
   TIEMPO_ABIERTO_MS: {
-    MIN: 100,
-    MAX: 3000,
-    DEFAULT: 250,
+    MIN: 150,
+    MAX: 1500,
+    DEFAULT: 350,
     STEP: 50,
   },
   ACTIVAR_SACUDIDA_DEFAULT: false,
   DESACTIVAR_PULSO_DEFAULT: true,
 } as const
+
+/**
+ * Clamp helper for physical Poka-Yoke boundaries
+ */
+export function clamp(val: number, min: number, max: number): number {
+  return Math.min(Math.max(val, min), max)
+}
 
 /**
  * Recommended Default Values for Servo Calibration

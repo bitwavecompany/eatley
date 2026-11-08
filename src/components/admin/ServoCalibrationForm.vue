@@ -6,7 +6,7 @@ import { useDeviceStore } from '@/stores/useDeviceStore'
 import { useToastStore } from '@/stores/useToastStore'
 import HelpTooltip from '@/components/common/HelpTooltip.vue'
 import UnlockClosureModal from '@/components/admin/UnlockClosureModal.vue'
-import { SERVO_CONSTRAINTS, SERVO_RECOMMENDED_DEFAULTS, CLOSURE_UNLOCK_KEYWORD } from '@/config/constants'
+import { SERVO_CONSTRAINTS, SERVO_RECOMMENDED_DEFAULTS, CLOSURE_UNLOCK_KEYWORD, clamp } from '@/config/constants'
 
 const configStore = useConfigStore()
 const deviceStore = useDeviceStore()
@@ -52,10 +52,31 @@ const hayCambiosPendientes = computed<boolean>(() => {
 async function handleSave(showToast = true): Promise<boolean> {
   saveSuccess.value = false
   try {
+    const validatedAnguloCerrado = clamp(
+      Number(anguloCerrado.value),
+      SERVO_CONSTRAINTS.ANGULO_CERRADO.MIN,
+      SERVO_CONSTRAINTS.ANGULO_CERRADO.MAX
+    )
+    const validatedAnguloAbierto = clamp(
+      Number(anguloAbierto.value),
+      SERVO_CONSTRAINTS.ANGULO_ABIERTO.MIN,
+      SERVO_CONSTRAINTS.ANGULO_ABIERTO.MAX
+    )
+    const validatedTiempoAbierto = clamp(
+      Number(tiempoAbiertoMs.value),
+      SERVO_CONSTRAINTS.TIEMPO_ABIERTO_MS.MIN,
+      SERVO_CONSTRAINTS.TIEMPO_ABIERTO_MS.MAX
+    )
+
+    // Ensure local refs reflect validated clamped values
+    anguloCerrado.value = validatedAnguloCerrado
+    anguloAbierto.value = validatedAnguloAbierto
+    tiempoAbiertoMs.value = validatedTiempoAbierto
+
     await configStore.actualizarConfiguracion({
-      angulo_cerrado: Number(anguloCerrado.value),
-      angulo_abierto: Number(anguloAbierto.value),
-      tiempo_abierto_ms: Number(tiempoAbiertoMs.value),
+      angulo_cerrado: validatedAnguloCerrado,
+      angulo_abierto: validatedAnguloAbierto,
+      tiempo_abierto_ms: validatedTiempoAbierto,
       activar_sacudida: Boolean(activarSacudida.value),
       desactivar_pulso_en_reposo: Boolean(desactivarPulso.value),
     })
@@ -97,19 +118,13 @@ function handleUnlockConfirmed() {
 }
 
 function resetToDefaults() {
-  if (!isClosureLocked.value) {
-    anguloCerrado.value = SERVO_RECOMMENDED_DEFAULTS.ANGULO_CERRADO
-  }
+  anguloCerrado.value = SERVO_RECOMMENDED_DEFAULTS.ANGULO_CERRADO
   anguloAbierto.value = SERVO_RECOMMENDED_DEFAULTS.ANGULO_ABIERTO
   tiempoAbiertoMs.value = SERVO_RECOMMENDED_DEFAULTS.TIEMPO_ABIERTO_MS
   activarSacudida.value = SERVO_RECOMMENDED_DEFAULTS.ACTIVAR_SACUDIDA
   desactivarPulso.value = SERVO_RECOMMENDED_DEFAULTS.DESACTIVAR_PULSO
-
-  if (isClosureLocked.value) {
-    toastStore.info('Valores restablecidos (posición de cierre protegida sin cambios)')
-  } else {
-    toastStore.info('Valores recomendados restablecidos en el formulario')
-  }
+  isClosureLocked.value = true
+  toastStore.info('Valores seguros restablecidos y posición de cierre bloqueada')
 }
 </script>
 
@@ -125,7 +140,7 @@ function resetToDefaults() {
           Calibración de compuerta y porción
         </h3>
         <p class="text-xs text-slate-500 mt-0.5">
-          Ajusta el giro del brazo y la cantidad de comida por servida
+          Ajusta el giro seguro del brazo y la cantidad de comida por servida
         </p>
       </div>
     </div>
@@ -142,13 +157,13 @@ function resetToDefaults() {
               </label>
               <HelpTooltip
                 title="Posición de cierre (reposo)"
-                text="Ángulo en el que la tapa cierra la boca de la botella. Si queda una rendija abierta, súbelo de 2° en 2° cuidando que el motor no quede forzado."
+                text="Posición base calibrada en 0°. Está bloqueada por seguridad física y lógica; si necesitas un micro-ajuste (máx. 15°), desbloquéalo con la palabra de confirmación."
                 position="top"
                 align="left"
               />
             </div>
             <p class="text-xs text-slate-500 mt-0.5">
-              Punto donde el brazo bloquea la salida.
+              Punto fijo (0°) donde el brazo bloquea la salida. Protegido contra cambios accidentales.
             </p>
           </div>
 
@@ -202,7 +217,7 @@ function resetToDefaults() {
             ]"
           />
           <span class="text-xs font-mono font-medium text-slate-400 w-20 sm:w-24 text-right shrink-0 whitespace-nowrap">
-            0° - 45°
+            0° - 15°
           </span>
 
           <!-- Touch/Click interceptor when locked -->
@@ -235,13 +250,13 @@ function resetToDefaults() {
               </label>
               <HelpTooltip
                 title="Posición de apertura"
-                text="Ángulo al que se levanta el brazo. Entre 45° y 75° suele bastar para que las croquetas caigan libremente."
+                text="Limitado a un máximo de 90° por seguridad física para evitar que el brazo golpee la estructura superior. En 50° ofrece una apertura óptima."
                 position="top"
                 align="left"
               />
             </div>
             <p class="text-xs text-slate-500 mt-0.5">
-              Amplitud del giro para dejar caer el alimento.
+              Amplitud del giro antihorario para dejar caer el alimento.
             </p>
           </div>
           <span class="font-mono text-sm font-bold px-2.5 py-1 rounded-xl bg-slate-100 border border-slate-200 text-emerald-700 shrink-0">
@@ -258,7 +273,7 @@ function resetToDefaults() {
             class="w-full h-11 py-3 cursor-pointer accent-emerald-600 bg-transparent flex-1 touch-manipulation"
           />
           <span class="text-xs font-mono font-medium text-slate-400 w-20 sm:w-24 text-right shrink-0 whitespace-nowrap">
-            30° - 180°
+            35° - 90°
           </span>
         </div>
       </div>
@@ -273,7 +288,7 @@ function resetToDefaults() {
               </label>
               <HelpTooltip
                 title="Tiempo de apertura (porción)"
-                text="Duración que la compuerta permanece abierta antes de cerrarse. Aumenta este valor para servir porciones más grandes."
+                text="Duración en milisegundos que la compuerta permanece abierta antes de regresar a 0°. En 350 ms sirve una ración estándar."
                 position="top"
                 align="left"
               />
@@ -296,7 +311,7 @@ function resetToDefaults() {
             class="w-full h-11 py-3 cursor-pointer accent-emerald-600 bg-transparent flex-1 touch-manipulation"
           />
           <span class="text-xs font-mono font-medium text-slate-400 w-28 text-right shrink-0 whitespace-nowrap">
-            100 - 3000 ms
+            150 - 1500 ms
           </span>
         </div>
       </div>
@@ -315,7 +330,7 @@ function resetToDefaults() {
               </span>
               <HelpTooltip
                 title="Sacudida anti-atasco"
-                text="Aplica micro-oscilaciones de ±5° en el brazo para desatorar croquetas grandes en el cuello de la botella."
+                text="Aplica micro-oscilaciones de ±5° para desatorar croquetas en el cuello de la botella."
                 position="top"
                 align="left"
               />
@@ -350,7 +365,7 @@ function resetToDefaults() {
               </span>
               <HelpTooltip
                 title="Modo reposo del motor"
-                text="Desenergiza el servomotor al terminar de cerrar. Mantenlo activo para proteger el motor; desactívalo solo si el peso de la comida abre la tapa por sí solo."
+                text="Desenergiza el servomotor al terminar de cerrar. Mantenlo activo para proteger el motor."
                 position="top"
                 align="left"
               />
@@ -383,7 +398,7 @@ function resetToDefaults() {
           class="min-h-[44px] px-3.5 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors inline-flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto self-start sm:self-auto border border-transparent hover:border-slate-200 touch-manipulation"
         >
           <RotateCcw class="w-3.5 h-3.5 text-slate-400" />
-          <span>Restablecer recomendados</span>
+          <span>Restaurar valores seguros</span>
         </button>
 
         <!-- Primary Action Group -->
