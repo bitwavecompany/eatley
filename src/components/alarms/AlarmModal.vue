@@ -309,14 +309,14 @@ function handleSubmit() {
         <!-- Android Time Roller Wheel Picker (H & M) -->
         <div class="py-2 flex flex-col items-center justify-center select-none">
           <div class="grid grid-cols-2 gap-8 w-full max-w-[260px]">
-            <!-- Column 1: Hours (H) -->
+            <!-- Column 1: Hours (Hora) -->
             <div
               class="flex flex-col items-center justify-center cursor-ns-resize"
               @wheel="handleHourWheel"
               @touchstart.passive="handleTouchStart"
               @touchmove.passive="handleHourTouchMove"
             >
-              <span class="text-[11px] font-bold text-slate-400 mb-1">H</span>
+              <span class="text-xs font-bold text-slate-400 mb-1">Hora</span>
 
               <!-- Desktop Arrow Up Button -->
               <button
@@ -364,14 +364,14 @@ function handleSubmit() {
               </button>
             </div>
 
-            <!-- Column 2: Minutes (M) -->
+            <!-- Column 2: Minutes (Min) -->
             <div
               class="flex flex-col items-center justify-center cursor-ns-resize"
               @wheel="handleMinuteWheel"
               @touchstart.passive="handleTouchStart"
               @touchmove.passive="handleMinuteTouchMove"
             >
-              <span class="text-[11px] font-bold text-slate-400 mb-1">M</span>
+              <span class="text-xs font-bold text-slate-400 mb-1">Min</span>
 
               <!-- Desktop Arrow Up Button -->
               <button
