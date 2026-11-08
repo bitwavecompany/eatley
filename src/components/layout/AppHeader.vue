@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
 import {
   PawPrint,
   PauseCircle,
@@ -12,7 +10,6 @@ import {
 } from '@lucide/vue'
 import { useDeviceStore } from '@/stores/useDeviceStore'
 import { useConfigStore } from '@/stores/useConfigStore'
-import { APP_ROUTES } from '@/config/constants'
 
 defineProps<{
   isAuthenticated?: boolean
@@ -22,39 +19,21 @@ const emit = defineEmits<{
   (e: 'logout'): void
 }>()
 
-const route = useRoute()
 const deviceStore = useDeviceStore()
 const configStore = useConfigStore()
-
-const currentRouteTitle = computed<string>(() => {
-  if (route.path === APP_ROUTES.ALARMS) return 'Alarmas'
-  if (route.path === APP_ROUTES.HISTORY) return 'Historial'
-  if (route.path === APP_ROUTES.ADMIN) return 'Ajustes'
-  return 'Control'
-})
 </script>
 
 <template>
-  <header class="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-slate-200 shadow-sm">
-    <div class="max-w-5xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2">
-      <!-- Brand & Name (Mobile) / Section Title (Desktop) -->
-      <div class="flex items-center gap-2.5 sm:gap-3 shrink-0">
-        <!-- Mobile Brand -->
-        <div class="flex items-center gap-2.5 md:hidden">
-          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center shadow-md shadow-emerald-500/20 shrink-0">
-            <PawPrint class="w-5 h-5 sm:w-6 sm:h-6 text-white stroke-[2.2]" />
-          </div>
-          <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900">
-            eat<span class="text-emerald-600">ley</span>
-          </h1>
+  <header class="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-slate-200 shadow-sm md:hidden">
+    <div class="px-3.5 sm:px-6 h-16 flex items-center justify-between gap-2">
+      <!-- Mobile Brand & Name -->
+      <div class="flex items-center gap-2.5 shrink-0">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center shadow-md shadow-emerald-500/20 shrink-0">
+          <PawPrint class="w-5 h-5 sm:w-6 sm:h-6 text-white stroke-[2.2]" />
         </div>
-
-        <!-- Desktop Context Breadcrumb -->
-        <div class="hidden md:flex items-center gap-2 text-sm text-slate-500 font-medium">
-          <span class="text-slate-400">Comedero</span>
-          <span class="text-slate-300">/</span>
-          <span class="font-bold text-slate-800">{{ currentRouteTitle }}</span>
-        </div>
+        <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900">
+          eat<span class="text-emerald-600">ley</span>
+        </h1>
       </div>
 
       <!-- State Badges Group & Sign Out -->

@@ -112,7 +112,7 @@ async function handleConfirmLogout() {
       />
 
       <!-- Main Content View Area -->
-      <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-24 md:pb-12">
+      <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 md:pt-8 pb-24 md:pb-12">
         <RouterView v-slot="{ Component }">
           <transition
             enter-active-class="transition duration-150 ease-out"
