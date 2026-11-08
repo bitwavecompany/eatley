@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { Gauge, Loader2, Play, Save, Check, RotateCcw, Lock, Unlock } from '@lucide/vue'
+import { Gauge, Loader2, Play, Save, Check, RotateCcw, Lock, Unlock, Wrench, AlertTriangle } from '@lucide/vue'
 import { useConfigStore } from '@/stores/useConfigStore'
 import { useDeviceStore } from '@/stores/useDeviceStore'
 import { useToastStore } from '@/stores/useToastStore'
 import HelpTooltip from '@/components/common/HelpTooltip.vue'
 import UnlockClosureModal from '@/components/admin/UnlockClosureModal.vue'
+import ConfirmationModal from '@/components/common/ConfirmationModal.vue'
 import { SERVO_CONSTRAINTS, SERVO_RECOMMENDED_DEFAULTS, CLOSURE_UNLOCK_KEYWORD, clamp } from '@/config/constants'
 
 const configStore = useConfigStore()
@@ -23,6 +24,8 @@ const saveSuccess = ref(false)
 const isTesting = ref(false)
 const isClosureLocked = ref(true)
 const showUnlockModal = ref(false)
+const showOpenMaintenanceModal = ref(false)
+const isMaintenanceOperating = ref(false)
 
 // Keep local state in sync when external configuration updates in Firebase
 watch(
@@ -115,6 +118,41 @@ function handleUnlockConfirmed() {
   isClosureLocked.value = false
   showUnlockModal.value = false
   toastStore.warning('Posición de cierre desbloqueada para ajuste manual')
+}
+
+async function handleOpenMaintenanceClick() {
+  if (deviceStore.isGateHeldOpen || isMaintenanceOperating.value) return
+  showOpenMaintenanceModal.value = true
+}
+
+async function confirmOpenMaintenance() {
+  showOpenMaintenanceModal.value = false
+  isMaintenanceOperating.value = true
+  try {
+    if (hayCambiosPendientes.value) {
+      const saved = await handleSave(false)
+      if (!saved) return
+    }
+    await deviceStore.openGateMaintenance()
+    toastStore.warning('Comando enviado: Abriendo compuerta para mantenimiento')
+  } catch {
+    toastStore.error('Error al solicitar apertura de compuerta')
+  } finally {
+    isMaintenanceOperating.value = false
+  }
+}
+
+async function handleCloseMaintenanceClick() {
+  if (isMaintenanceOperating.value) return
+  isMaintenanceOperating.value = true
+  try {
+    await deviceStore.closeGateMaintenance()
+    toastStore.info('Comando enviado: Cerrando compuerta')
+  } catch {
+    toastStore.error('Error al solicitar cierre de compuerta')
+  } finally {
+    isMaintenanceOperating.value = false
+  }
 }
 
 function resetToDefaults() {
@@ -389,6 +427,96 @@ function resetToDefaults() {
         </div>
       </div>
 
+      <!-- Maintenance / Continuous Gate Opening Section: Jakob Nielsen #1 (Visibility of system status) & #5 (Error prevention) -->
+      <div
+        class="rounded-2xl border p-4 sm:p-5 transition-all"
+        :class="[
+          deviceStore.isGateHeldOpen
+            ? 'border-amber-300 bg-amber-50/70 shadow-sm'
+            : 'border-slate-200 bg-slate-50/60'
+        ]"
+      >
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex items-start gap-3">
+            <div
+              class="p-2.5 rounded-xl shrink-0 mt-0.5 transition-colors"
+              :class="deviceStore.isGateHeldOpen ? 'bg-amber-200/80 text-amber-800' : 'bg-slate-200/70 text-slate-700'"
+            >
+              <AlertTriangle v-if="deviceStore.isGateHeldOpen" class="w-5 h-5 text-amber-700 animate-pulse" />
+              <Wrench v-else class="w-5 h-5 text-slate-700" />
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span
+                  v-if="deviceStore.isGateHeldOpen"
+                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase tracking-wide bg-amber-200 text-amber-900 border border-amber-300"
+                >
+                  <span class="w-2 h-2 rounded-full bg-amber-600 animate-ping"></span>
+                  Compuerta abierta
+                </span>
+                <h4 class="text-sm font-bold text-slate-900">
+                  {{ deviceStore.isGateHeldOpen ? 'Compuerta sostenida en modo mantenimiento' : 'Apertura continua para mantenimiento' }}
+                </h4>
+                <HelpTooltip
+                  title="Apertura continua para mantenimiento"
+                  text="Mueve el servomotor al ángulo de apertura y lo deja sostenido de forma continua. Úsalo para limpiar el ducto, desatascar restos o inspección física."
+                  position="top"
+                  align="left"
+                />
+              </div>
+              <p class="text-xs mt-1 max-w-lg leading-relaxed" :class="deviceStore.isGateHeldOpen ? 'text-amber-900 font-medium' : 'text-slate-500'">
+                {{
+                  deviceStore.isGateHeldOpen
+                    ? `La compuerta está físicamente abierta en ${anguloAbierto}°. Al terminar las tareas de limpieza, pulsa 'Cerrar compuerta' para restaurar el cierre hermético.`
+                    : 'Abre la compuerta y la mantiene abierta hasta que envíes la orden de cierre. Advertencia: si hay alimento en el contenedor, se vaciará por completo por gravedad.'
+                }}
+              </p>
+            </div>
+          </div>
+
+          <div class="shrink-0 flex items-center justify-end">
+            <!-- Close Button (when held open) -->
+            <button
+              v-if="deviceStore.isGateHeldOpen"
+              type="button"
+              @click="handleCloseMaintenanceClick"
+              :disabled="isMaintenanceOperating || deviceStore.isGateTransitioning"
+              class="w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-600/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Loader2 v-if="isMaintenanceOperating || deviceStore.isGateTransitioning" class="w-4 h-4 animate-spin text-white" />
+              <Lock v-else class="w-4 h-4 text-white" />
+              <span>{{ isMaintenanceOperating || deviceStore.isGateTransitioning ? 'Cerrando...' : 'Cerrar compuerta ahora' }}</span>
+            </button>
+
+            <!-- Open Button (when closed) -->
+            <button
+              v-else
+              type="button"
+              @click="handleOpenMaintenanceClick"
+              :disabled="isMaintenanceOperating || deviceStore.isGateTransitioning || !deviceStore.isOnline"
+              class="w-full sm:w-auto min-h-[44px] px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold border shadow-sm transition-all flex items-center justify-center gap-2 touch-manipulation"
+              :class="[
+                !deviceStore.isOnline
+                  ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed shadow-none'
+                  : isMaintenanceOperating || deviceStore.isGateTransitioning
+                    ? 'bg-amber-100 text-amber-800 border-amber-300 cursor-wait'
+                    : 'bg-white hover:bg-amber-50 text-amber-800 border-amber-300 hover:border-amber-400 active:scale-[0.98] cursor-pointer'
+              ]"
+            >
+              <Loader2 v-if="isMaintenanceOperating || deviceStore.isGateTransitioning" class="w-4 h-4 animate-spin text-amber-600" />
+              <Wrench v-else class="w-4 h-4 text-amber-600" />
+              <span>
+                {{
+                  !deviceStore.isOnline
+                    ? 'ESP32 desconectado'
+                    : (isMaintenanceOperating || deviceStore.isGateTransitioning ? 'Abriendo compuerta...' : 'Abrir compuerta (Mantenimiento)')
+                }}
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Action Footer: Jakob Nielsen #3 (User control and freedom) & #5 (Error prevention) -->
       <div class="pt-5 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
         <!-- Reset Button -->
@@ -474,6 +602,20 @@ function resetToDefaults() {
       :keyword="CLOSURE_UNLOCK_KEYWORD"
       @confirm="handleUnlockConfirmed"
       @close="showUnlockModal = false"
+    />
+
+    <!-- Maintenance Safety Warning Confirmation Modal: Jakob Nielsen #5 (Error prevention) -->
+    <ConfirmationModal
+      :is-open="showOpenMaintenanceModal"
+      title="¿Abrir compuerta para mantenimiento?"
+      subtitle="Atención: Esta opción vaciará el alimento"
+      description="La compuerta se moverá al ángulo configurado y permanecerá abierta continuamente hasta que presiones 'Cerrar compuerta'. Si el depósito contiene croquetas, se vaciarán por completo por gravedad. Se recomienda vaciar o retirar el comedero antes de proceder."
+      confirm-text="Entendido, abrir compuerta"
+      cancel-text="Cancelar"
+      variant="warning"
+      :icon="AlertTriangle"
+      @confirm="confirmOpenMaintenance"
+      @close="showOpenMaintenanceModal = false"
     />
   </div>
 </template>

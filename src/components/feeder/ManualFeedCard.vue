@@ -8,6 +8,7 @@ import {
   Clock,
   CheckCircle2,
   CloudOff,
+  Wrench,
 } from '@lucide/vue'
 import { useDeviceStore } from '@/stores/useDeviceStore'
 import { useConfigStore } from '@/stores/useConfigStore'
@@ -38,7 +39,8 @@ async function handleFeedClick() {
   if (
     deviceStore.isDispensing ||
     isCoolingDown.value ||
-    !deviceStore.isFirebaseConnected
+    !deviceStore.isFirebaseConnected ||
+    deviceStore.isGateHeldOpen
   ) {
     return
   }
@@ -62,11 +64,13 @@ async function handleFeedClick() {
       :class="[
         !deviceStore.isFirebaseConnected
           ? 'bg-amber-400/15 opacity-70'
-          : deviceStore.isDispensing
-            ? 'bg-amber-400/20 opacity-100'
-            : isCoolingDown
-              ? 'bg-slate-200/50 opacity-70'
-              : 'bg-emerald-400/15 opacity-80'
+          : deviceStore.isGateHeldOpen
+            ? 'bg-amber-400/25 opacity-90'
+            : deviceStore.isDispensing
+              ? 'bg-amber-400/20 opacity-100'
+              : isCoolingDown
+                ? 'bg-slate-200/50 opacity-70'
+                : 'bg-emerald-400/15 opacity-80'
       ]"
     ></div>
 
@@ -78,16 +82,22 @@ async function handleFeedClick() {
           :class="[
             !deviceStore.isFirebaseConnected
               ? 'bg-amber-50 border-amber-300 text-amber-600'
-              : deviceStore.isDispensing
-                ? 'bg-amber-50 border-amber-300 text-amber-600 scale-105 shadow-md shadow-amber-500/10'
-                : isCoolingDown
-                  ? 'bg-slate-100 border-slate-200 text-slate-500'
-                  : 'bg-emerald-50 border-emerald-200 text-emerald-600 hover:scale-105 shadow-lg shadow-emerald-500/10'
+              : deviceStore.isGateHeldOpen
+                ? 'bg-amber-50 border-amber-300 text-amber-600 shadow-md shadow-amber-500/10'
+                : deviceStore.isDispensing
+                  ? 'bg-amber-50 border-amber-300 text-amber-600 scale-105 shadow-md shadow-amber-500/10'
+                  : isCoolingDown
+                    ? 'bg-slate-100 border-slate-200 text-slate-500'
+                    : 'bg-emerald-50 border-emerald-200 text-emerald-600 hover:scale-105 shadow-lg shadow-emerald-500/10'
           ]"
         >
           <CloudOff
             v-if="!deviceStore.isFirebaseConnected"
             class="w-12 h-12 text-amber-600 animate-pulse"
+          />
+          <Wrench
+            v-else-if="deviceStore.isGateHeldOpen"
+            class="w-12 h-12 text-amber-600"
           />
           <Loader2
             v-else-if="deviceStore.isDispensing"
@@ -105,7 +115,7 @@ async function handleFeedClick() {
 
         <!-- Tiny Pulse Dot (only when fully ready and connected) -->
         <span
-          v-if="deviceStore.isFirebaseConnected && !deviceStore.isDispensing && !isCoolingDown"
+          v-if="deviceStore.isFirebaseConnected && !deviceStore.isDispensing && !isCoolingDown && !deviceStore.isGateHeldOpen"
           class="absolute bottom-1 right-1 flex h-4 w-4"
         >
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -118,9 +128,11 @@ async function handleFeedClick() {
         {{
           !deviceStore.isFirebaseConnected
             ? 'Sin conexión con la nube'
-            : deviceStore.isDispensing
-              ? 'Dispensando alimento...'
-              : 'Alimentar manualmente'
+            : deviceStore.isGateHeldOpen
+              ? 'Compuerta en mantenimiento'
+              : deviceStore.isDispensing
+                ? 'Dispensando alimento...'
+                : 'Alimentar manualmente'
         }}
       </h2>
 
@@ -129,21 +141,27 @@ async function handleFeedClick() {
         <button
           type="button"
           @click="handleFeedClick"
-          :disabled="deviceStore.isDispensing || isCoolingDown || !deviceStore.isFirebaseConnected"
+          :disabled="deviceStore.isDispensing || isCoolingDown || !deviceStore.isFirebaseConnected || deviceStore.isGateHeldOpen"
           class="w-full py-4 px-6 rounded-2xl font-bold text-base sm:text-lg tracking-wide transition-all duration-200 flex items-center justify-center gap-3 shadow-lg active:scale-95 disabled:active:scale-100 disabled:cursor-not-allowed select-none"
           :class="[
             !deviceStore.isFirebaseConnected
               ? 'bg-amber-100 text-amber-800 border border-amber-300 cursor-not-allowed'
-              : deviceStore.isDispensing
-                ? 'bg-amber-100 text-amber-800 border border-amber-300 cursor-wait'
-                : isCoolingDown
-                  ? 'bg-slate-100 text-slate-500 border border-slate-200'
-                  : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/25 hover:shadow-emerald-600/40'
+              : deviceStore.isGateHeldOpen
+                ? 'bg-amber-100 text-amber-900 border border-amber-300 cursor-not-allowed'
+                : deviceStore.isDispensing
+                  ? 'bg-amber-100 text-amber-800 border border-amber-300 cursor-wait'
+                  : isCoolingDown
+                    ? 'bg-slate-100 text-slate-500 border border-slate-200'
+                    : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/25 hover:shadow-emerald-600/40'
           ]"
         >
           <RotateCw
             v-if="!deviceStore.isFirebaseConnected"
             class="w-6 h-6 animate-spin text-amber-700"
+          />
+          <Wrench
+            v-else-if="deviceStore.isGateHeldOpen"
+            class="w-6 h-6 text-amber-800"
           />
           <RotateCw
             v-else-if="deviceStore.isDispensing"
@@ -158,11 +176,13 @@ async function handleFeedClick() {
             {{
               !deviceStore.isFirebaseConnected
                 ? 'Reconectando con la nube...'
-                : deviceStore.isDispensing
-                  ? 'Alimentando...'
-                  : isCoolingDown
-                    ? `Espera ${remainingSeconds}s`
-                    : 'Alimentar'
+                : deviceStore.isGateHeldOpen
+                  ? 'Compuerta abierta (Mantenimiento)'
+                  : deviceStore.isDispensing
+                    ? 'Alimentando...'
+                    : isCoolingDown
+                      ? `Espera ${remainingSeconds}s`
+                      : 'Alimentar'
             }}
           </span>
         </button>

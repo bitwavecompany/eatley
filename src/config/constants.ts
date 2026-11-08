@@ -57,6 +57,18 @@ export const SERVO_RECOMMENDED_DEFAULTS = {
 } as const
 
 /**
+ * Admin and Maintenance Commands
+ */
+export const ADMIN_COMMANDS = {
+  NONE: 'ninguno',
+  TEST_SERVO: 'probar_servo',
+  REBOOT_ESP32: 'reiniciar_esp32',
+  OPEN_MAINTENANCE: 'abrir_mantenimiento',
+  CLOSE_MAINTENANCE: 'cerrar_mantenimiento',
+  OPENED_MAINTENANCE: 'abierto_mantenimiento',
+} as const
+
+/**
  * Keyword required to unlock critical mechanical closure angle
  */
 export const CLOSURE_UNLOCK_KEYWORD = 'DESBLOQUEAR'

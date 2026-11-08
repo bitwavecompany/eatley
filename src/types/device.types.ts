@@ -6,7 +6,13 @@ export interface DisparoManual {
   origen_solicitud: OrigenDisparoManual
 }
 
-export type ComandoAdmin = 'ninguno' | 'probar_servo' | 'reiniciar_esp32'
+export type ComandoAdmin =
+  | 'ninguno'
+  | 'probar_servo'
+  | 'reiniciar_esp32'
+  | 'abrir_mantenimiento'
+  | 'cerrar_mantenimiento'
+  | 'abierto_mantenimiento'
 
 export interface EstadoEsp32 {
   ultima_conexion: number // Unix timestamp (ms) of the controller's last response

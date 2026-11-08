@@ -14,7 +14,7 @@ import {
   type User,
 } from 'firebase/auth'
 import { getFirebaseDb, getFirebaseAuth } from './firebase.client'
-import { DB_PATHS, SERVO_CONSTRAINTS, OPERATIONAL_CONSTRAINTS } from '@/config/constants'
+import { DB_PATHS, SERVO_CONSTRAINTS, OPERATIONAL_CONSTRAINTS, ADMIN_COMMANDS } from '@/config/constants'
 import { env } from '@/config/env'
 import type {
   Alarma,
@@ -364,10 +364,24 @@ export const FeederRepository = {
       if (localMock.estadoEsp32) {
         localMock.estadoEsp32.comando_admin = comando
         localMock.notifyEstado()
-        if (comando !== 'ninguno') {
+        if (comando === ADMIN_COMMANDS.OPEN_MAINTENANCE) {
           setTimeout(() => {
             if (localMock.estadoEsp32) {
-              localMock.estadoEsp32.comando_admin = 'ninguno'
+              localMock.estadoEsp32.comando_admin = ADMIN_COMMANDS.OPENED_MAINTENANCE
+              localMock.notifyEstado()
+            }
+          }, 400)
+        } else if (comando === ADMIN_COMMANDS.CLOSE_MAINTENANCE) {
+          setTimeout(() => {
+            if (localMock.estadoEsp32) {
+              localMock.estadoEsp32.comando_admin = ADMIN_COMMANDS.NONE
+              localMock.notifyEstado()
+            }
+          }, 450)
+        } else if (comando !== ADMIN_COMMANDS.NONE && comando !== ADMIN_COMMANDS.OPENED_MAINTENANCE) {
+          setTimeout(() => {
+            if (localMock.estadoEsp32) {
+              localMock.estadoEsp32.comando_admin = ADMIN_COMMANDS.NONE
               localMock.notifyEstado()
             }
           }, 2000)

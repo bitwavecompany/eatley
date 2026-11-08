@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { Cpu, Loader2, Power, AlertTriangle } from '@lucide/vue'
 import { useDeviceStore } from '@/stores/useDeviceStore'
 import { useToastStore } from '@/stores/useToastStore'
+import { ADMIN_COMMANDS } from '@/config/constants'
 import ConfirmationModal from '@/components/common/ConfirmationModal.vue'
 import HelpTooltip from '@/components/common/HelpTooltip.vue'
 
@@ -24,6 +25,52 @@ const wifiQuality = computed<{ label: string; color: string }>(() => {
     case 'debil':
     default:
       return { label: 'Débil', color: 'text-rose-700' }
+  }
+})
+
+const commandStatusInfo = computed(() => {
+  const cmd = deviceStore.activeAdminCommand
+  if (cmd === ADMIN_COMMANDS.NONE) return null
+
+  if (cmd === ADMIN_COMMANDS.OPENED_MAINTENANCE) {
+    return {
+      label: 'Compuerta abierta en modo mantenimiento',
+      status: 'Activo',
+      isPending: false,
+    }
+  }
+  if (cmd === ADMIN_COMMANDS.OPEN_MAINTENANCE) {
+    return {
+      label: 'Abriendo compuerta para mantenimiento...',
+      status: 'En curso',
+      isPending: true,
+    }
+  }
+  if (cmd === ADMIN_COMMANDS.CLOSE_MAINTENANCE) {
+    return {
+      label: 'Cerrando compuerta...',
+      status: 'En curso',
+      isPending: true,
+    }
+  }
+  if (cmd === ADMIN_COMMANDS.TEST_SERVO) {
+    return {
+      label: 'Prueba de calibración en seco...',
+      status: 'En curso',
+      isPending: true,
+    }
+  }
+  if (cmd === ADMIN_COMMANDS.REBOOT_ESP32) {
+    return {
+      label: 'Reiniciando microcontrolador...',
+      status: 'En curso',
+      isPending: true,
+    }
+  }
+  return {
+    label: `Comando: ${cmd}`,
+    status: 'Pendiente',
+    isPending: true,
   }
 })
 
@@ -125,14 +172,25 @@ async function confirmReboot() {
 
     <!-- Active Command Banner (if any) -->
     <div
-      v-if="deviceStore.activeAdminCommand !== 'ninguno'"
-      class="mt-4 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center justify-between"
+      v-if="commandStatusInfo"
+      class="mt-4 p-3 rounded-xl border text-xs flex items-center justify-between"
+      :class="[
+        deviceStore.isGateHeldOpen
+          ? 'bg-amber-50 border-amber-300 text-amber-900'
+          : 'bg-slate-50 border-slate-200 text-slate-800'
+      ]"
     >
       <div class="flex items-center gap-2">
-        <Loader2 class="w-4 h-4 animate-spin text-amber-600" />
-        <span>Comando enviado al ESP32: <strong class="font-mono">{{ deviceStore.activeAdminCommand }}</strong></span>
+        <Loader2 v-if="commandStatusInfo.isPending" class="w-4 h-4 animate-spin text-amber-600" />
+        <AlertTriangle v-else class="w-4 h-4 text-amber-600" />
+        <span><strong class="font-semibold">{{ commandStatusInfo.label }}</strong></span>
       </div>
-      <span class="text-[11px] text-amber-700">Esperando ejecución...</span>
+      <span
+        class="text-[11px] px-2 py-0.5 rounded-full"
+        :class="deviceStore.isGateHeldOpen ? 'bg-amber-200 text-amber-900 font-bold' : 'text-slate-500'"
+      >
+        {{ commandStatusInfo.status }}
+      </span>
     </div>
 
     <!-- Actions Footer: Jakob Nielsen #5 (Error prevention) -->

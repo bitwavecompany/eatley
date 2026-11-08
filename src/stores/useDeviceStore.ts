@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { FeederRepository } from '@/services/feeder.repository'
 import { env } from '@/config/env'
+import { ADMIN_COMMANDS } from '@/config/constants'
 import type {
   DisparoManual,
   EstadoEsp32,
@@ -58,7 +59,16 @@ export const useDeviceStore = defineStore('device', () => {
   })
 
   const activeAdminCommand = computed<ComandoAdmin>(() => {
-    return estadoEsp32.value?.comando_admin || 'ninguno'
+    return estadoEsp32.value?.comando_admin || ADMIN_COMMANDS.NONE
+  })
+
+  const isGateHeldOpen = computed<boolean>(() => {
+    return estadoEsp32.value?.comando_admin === ADMIN_COMMANDS.OPENED_MAINTENANCE
+  })
+
+  const isGateTransitioning = computed<boolean>(() => {
+    const cmd = estadoEsp32.value?.comando_admin
+    return cmd === ADMIN_COMMANDS.OPEN_MAINTENANCE || cmd === ADMIN_COMMANDS.CLOSE_MAINTENANCE
   })
 
   const uptimeFormatted = computed<string>(() => {
@@ -105,11 +115,19 @@ export const useDeviceStore = defineStore('device', () => {
   }
 
   async function rebootEsp32(): Promise<void> {
-    await sendAdminCommand('reiniciar_esp32')
+    await sendAdminCommand(ADMIN_COMMANDS.REBOOT_ESP32)
   }
 
   async function testServoDryRun(): Promise<void> {
-    await sendAdminCommand('probar_servo')
+    await sendAdminCommand(ADMIN_COMMANDS.TEST_SERVO)
+  }
+
+  async function openGateMaintenance(): Promise<void> {
+    await sendAdminCommand(ADMIN_COMMANDS.OPEN_MAINTENANCE)
+  }
+
+  async function closeGateMaintenance(): Promise<void> {
+    await sendAdminCommand(ADMIN_COMMANDS.CLOSE_MAINTENANCE)
   }
 
   function destroy() {
@@ -133,6 +151,8 @@ export const useDeviceStore = defineStore('device', () => {
     wifiLevel,
     isDispensing,
     activeAdminCommand,
+    isGateHeldOpen,
+    isGateTransitioning,
     uptimeFormatted,
     init,
     destroy,
@@ -140,5 +160,7 @@ export const useDeviceStore = defineStore('device', () => {
     sendAdminCommand,
     rebootEsp32,
     testServoDryRun,
+    openGateMaintenance,
+    closeGateMaintenance,
   }
 })
