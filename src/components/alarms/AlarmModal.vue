@@ -5,6 +5,8 @@ import {
   Check,
   ArrowLeft,
   ChevronRight,
+  ChevronUp,
+  ChevronDown,
   Trash2,
   AlertCircle,
 } from '@lucide/vue'
@@ -316,11 +318,22 @@ function handleSubmit() {
             >
               <span class="text-[11px] font-bold text-slate-400 mb-1">H</span>
 
+              <!-- Desktop Arrow Up Button -->
+              <button
+                type="button"
+                @click="changeHour(-1)"
+                class="hidden md:flex items-center justify-center w-12 h-8 mb-1 rounded-xl bg-slate-50 hover:bg-emerald-50 text-slate-500 hover:text-emerald-700 border border-slate-200 hover:border-emerald-300 shadow-xs transition-all active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                title="Hora anterior (-1h)"
+                aria-label="Hora anterior"
+              >
+                <ChevronUp class="w-4 h-4 stroke-[2.5]" />
+              </button>
+
               <!-- Previous Hour (-1) -->
               <button
                 type="button"
                 @click="changeHour(-1)"
-                class="h-7 text-xl font-light text-slate-300 hover:text-slate-600 transition-colors font-mono"
+                class="h-7 text-xl font-light text-slate-300 hover:text-slate-600 transition-colors font-mono cursor-pointer"
               >
                 {{ String((selectedHour - 1 + 24) % 24).padStart(2, '0') }}
               </button>
@@ -334,9 +347,20 @@ function handleSubmit() {
               <button
                 type="button"
                 @click="changeHour(1)"
-                class="h-7 text-xl font-light text-slate-300 hover:text-slate-600 transition-colors font-mono"
+                class="h-7 text-xl font-light text-slate-300 hover:text-slate-600 transition-colors font-mono cursor-pointer"
               >
                 {{ String((selectedHour + 1) % 24).padStart(2, '0') }}
+              </button>
+
+              <!-- Desktop Arrow Down Button -->
+              <button
+                type="button"
+                @click="changeHour(1)"
+                class="hidden md:flex items-center justify-center w-12 h-8 mt-1 rounded-xl bg-slate-50 hover:bg-emerald-50 text-slate-500 hover:text-emerald-700 border border-slate-200 hover:border-emerald-300 shadow-xs transition-all active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                title="Siguiente hora (+1h)"
+                aria-label="Siguiente hora"
+              >
+                <ChevronDown class="w-4 h-4 stroke-[2.5]" />
               </button>
             </div>
 
@@ -349,11 +373,22 @@ function handleSubmit() {
             >
               <span class="text-[11px] font-bold text-slate-400 mb-1">M</span>
 
+              <!-- Desktop Arrow Up Button -->
+              <button
+                type="button"
+                @click="changeMinute(-1)"
+                class="hidden md:flex items-center justify-center w-12 h-8 mb-1 rounded-xl bg-slate-50 hover:bg-emerald-50 text-slate-500 hover:text-emerald-700 border border-slate-200 hover:border-emerald-300 shadow-xs transition-all active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                title="Minuto anterior (-1m)"
+                aria-label="Minuto anterior"
+              >
+                <ChevronUp class="w-4 h-4 stroke-[2.5]" />
+              </button>
+
               <!-- Previous Minute (-1) -->
               <button
                 type="button"
                 @click="changeMinute(-1)"
-                class="h-7 text-xl font-light text-slate-300 hover:text-slate-600 transition-colors font-mono"
+                class="h-7 text-xl font-light text-slate-300 hover:text-slate-600 transition-colors font-mono cursor-pointer"
               >
                 {{ String((selectedMinute - 1 + 60) % 60).padStart(2, '0') }}
               </button>
@@ -367,9 +402,20 @@ function handleSubmit() {
               <button
                 type="button"
                 @click="changeMinute(1)"
-                class="h-7 text-xl font-light text-slate-300 hover:text-slate-600 transition-colors font-mono"
+                class="h-7 text-xl font-light text-slate-300 hover:text-slate-600 transition-colors font-mono cursor-pointer"
               >
                 {{ String((selectedMinute + 1) % 60).padStart(2, '0') }}
+              </button>
+
+              <!-- Desktop Arrow Down Button -->
+              <button
+                type="button"
+                @click="changeMinute(1)"
+                class="hidden md:flex items-center justify-center w-12 h-8 mt-1 rounded-xl bg-slate-50 hover:bg-emerald-50 text-slate-500 hover:text-emerald-700 border border-slate-200 hover:border-emerald-300 shadow-xs transition-all active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                title="Siguiente minuto (+1m)"
+                aria-label="Siguiente minuto"
+              >
+                <ChevronDown class="w-4 h-4 stroke-[2.5]" />
               </button>
             </div>
           </div>
