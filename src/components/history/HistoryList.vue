@@ -75,34 +75,19 @@ function formatTimestamp(ts: number): { time: string; date: string } {
         </div>
 
         <div>
-          <!-- Title & Origin Badge -->
-          <div class="flex items-center gap-2 flex-wrap">
-            <span class="font-bold text-sm text-slate-900">
-              {{
-                ev.origen === 'alarma'
-                  ? ev.alarma_etiqueta || 'Alarma programada'
-                  : ev.origen === 'manual'
-                    ? 'Disparo manual'
-                    : 'Prueba técnica de servo'
-              }}
-            </span>
-
-            <span
-              class="text-[10px] font-semibold capitalize px-2 py-0.5 rounded-full"
-              :class="[
-                ev.origen === 'manual'
-                  ? 'bg-emerald-100 text-emerald-800'
-                  : ev.origen === 'alarma'
-                    ? 'bg-blue-100 text-blue-800'
-                    : 'bg-amber-100 text-amber-800'
-              ]"
-            >
-              {{ ev.origen }}
-            </span>
-          </div>
+          <!-- Title -->
+          <h4 class="font-bold text-sm text-slate-900">
+            {{
+              ev.origen === 'alarma'
+                ? ev.alarma_etiqueta || 'Alarma programada'
+                : ev.origen === 'manual'
+                  ? 'Disparo manual'
+                  : 'Prueba técnica de servo'
+            }}
+          </h4>
 
           <!-- Time & Date -->
-          <div class="flex items-center gap-2 text-xs text-slate-500 mt-1 font-mono">
+          <div class="flex items-center gap-2 text-xs text-slate-500 mt-1 font-mono flex-wrap">
             <span class="text-slate-800 font-semibold">{{ formatTimestamp(ev.timestamp).time }}</span>
             <span>•</span>
             <span>{{ formatTimestamp(ev.timestamp).date }}</span>
@@ -112,8 +97,8 @@ function formatTimestamp(ts: number): { time: string; date: string } {
         </div>
       </div>
 
-      <!-- Right: Verification Badges -->
-      <div class="flex items-center gap-2 self-start sm:self-center shrink-0 flex-wrap">
+      <!-- Right: Verification Badges & Origin -->
+      <div class="flex flex-row sm:flex-col items-center sm:items-end gap-1.5 self-start sm:self-center shrink-0 flex-wrap sm:flex-nowrap">
         <!-- ESP32 Execution Status -->
         <span
           class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border"
@@ -126,6 +111,20 @@ function formatTimestamp(ts: number): { time: string; date: string } {
           <CheckCircle v-if="ev.estado_esp32 === 'completado'" class="w-3.5 h-3.5 text-emerald-600" />
           <XCircle v-else class="w-3.5 h-3.5 text-rose-600" />
           <span class="capitalize">{{ ev.estado_esp32 }}</span>
+        </span>
+
+        <!-- Origin Badge (Desktop: under status / Mobile: beside status) -->
+        <span
+          class="text-[10px] font-semibold capitalize px-2 py-0.5 rounded-full border shadow-2xs"
+          :class="[
+            ev.origen === 'manual'
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+              : ev.origen === 'alarma'
+                ? 'bg-blue-50 border-blue-200 text-blue-800'
+                : 'bg-amber-50 border-amber-200 text-amber-800'
+          ]"
+        >
+          {{ ev.origen.replace('_', ' ') }}
         </span>
 
         <!-- Microswitch Physical Confirmation -->
