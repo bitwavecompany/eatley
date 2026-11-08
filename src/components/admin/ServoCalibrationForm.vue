@@ -410,7 +410,7 @@ function resetToDefaults() {
                 class="w-4 h-4 text-emerald-600 fill-emerald-600"
               />
               <span>
-                {{ deviceStore.activeAdminCommand === 'probar_servo' || isTesting ? 'Probando...' : '▷ Probar movimiento' }}
+                {{ deviceStore.activeAdminCommand === 'probar_servo' || isTesting ? 'Probando...' : 'Probar movimiento' }}
               </span>
             </button>
             <HelpTooltip
